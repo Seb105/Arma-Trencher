@@ -1,0 +1,9 @@
+
+## Added by HEMTT
+releases/*
+*.biprivatekey
+keys/*
+.hemtt/local
+####
+*.pbo
+.hemttout/*
