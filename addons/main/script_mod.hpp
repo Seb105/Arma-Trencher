@@ -1,5 +1,5 @@
 #define MAINPREFIX z
-#define PREFIX acp
+#define PREFIX trencher
 
 #include "script_version.hpp"
 

@@ -1,5 +1,5 @@
-name = "acp"
-prefix = "acp"
+name = "trencher"
+prefix = "trencher"
 
 [properties]
 author = "Seb"

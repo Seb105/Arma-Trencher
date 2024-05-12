@@ -8,9 +8,7 @@ class CfgPatches
         units[] = {};
         weapons[] = {};
         requiredVersion = REQUIRED_VERSION;
-        requiredAddons[] = {
-            "A3_Characters_F_Enoch",
-            "A3_Supplies_F_Enoch_Bags"};
+        requiredAddons[] = {};
         author = "Seb";
         VERSION_CONFIG;
     };
@@ -458,7 +456,7 @@ class CfgWeapons
         model = QPATHTOF(Vests\V_CarrierRigBW_F.p3d);
         class ItemInfo : ItemInfo
         {
-            uniformModel = "z\acp\addons\main\Vests\V_CarrierRigBW_F.p3d";
+            uniformModel = "z\trencher\addons\main\Vests\V_CarrierRigBW_F.p3d";
             hiddenSelections[] = {
                 "camo"};
         };
