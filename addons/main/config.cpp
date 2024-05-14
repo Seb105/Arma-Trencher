@@ -75,10 +75,12 @@ class CfgVehicles
         isDisposable = 0;
         is3DEN = 1;
         icon =  "\a3\Missions_F_Beta\data\img\iconMPTypeDefense_ca.paa";
+        portrait = "\a3\Missions_F_Beta\data\img\portraitMPTypeDefense_ca.paa";
     };
     class GVAR(Module_TrenchController): GVAR(Module_TrenchPiece) {
         displayName = "Trench Controller";
         icon = "A3\Modules_F_Tacops\Data\CivilianPresence\icon32_ca.paa";
+        portrait = "A3\Modules_F_Tacops\Data\CivilianPresence\icon32_ca.paa";
         class Arguments
         {
             class TrenchDepth
@@ -103,8 +105,8 @@ class CfgVehicles
 class Cfg3DEN {
     class EventHandlers {
         class ADDON {
-            OnMissionLoad = QUOTE(call FUNC(onMissionLoad));
-            OnEditableEntityAdded = QUOTE(_this call FUNC(onEntityAdded));
+            onMissionLoad =  QUOTE([] call FUNC(onMissionLoad));
+            onEditableEntityAdded = QUOTE(_this call FUNC(onEntityAdded));
         };
     };
 };
@@ -115,3 +117,5 @@ class CfgFactionClasses {
         displayName = "Trench Systems";
     };
 };
+
+#include "CfgEventHandlers.hpp"

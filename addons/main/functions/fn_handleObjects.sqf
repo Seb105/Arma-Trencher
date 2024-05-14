@@ -16,10 +16,13 @@ private _trenchPieces = _origin getVariable "trenchPieces"; // By reference
     if (_trenchPieces findIf {_posASL distance2D _x < _segmentLength/2} isNotEqualTo -1) then {
         continue
     };
-    private _trenchPiece = createVehicle ["Peer_Trench_Straight_Short_Chameleon", ASLtoATL _posASL, [], 0, "CAN_COLLIDE"];
+    // private _trenchPiece = createVehicle ["Peer_Trench_Straight_Short_Chameleon", ASLtoATL _posASL, [], 0, "CAN_COLLIDE"];
+    private _trenchPiece = createSimpleObject ["Peer_Trench_Straight_Short_Chameleon", _posASL];
     _trenchPiece setPosASL _posASL;
     _posASL set [2, true];
     _trenchPiece setObjectTextureGlobal [0, (surfaceTexture _posASL)];
+    _trenchPiece hideSelection ["snow", true];
     _trenchPiece setVectorDirAndUp _vectorDirAndUp;
-    _trenchPieces pushBack _trenchPiece;        
+    _trenchPieces pushBack _trenchPiece;
+    _trench enableSimulationGlobal false;
 } forEach _toPlace;
