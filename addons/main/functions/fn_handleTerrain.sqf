@@ -1,4 +1,4 @@
-params ["_origin", "_nodes", "_terrainPoints", "_widthToObj"];
+params ["_origin", "_nodes", "_terrainPoints", "_widthToEdge"];
 // Iterate through and remove duplicatge [x,y] points, keeping the lowest z
 private _terrainPointsFiltered = [];
 {
@@ -22,6 +22,6 @@ private _terrainPointsSub = _terrainPointsFiltered;// apply {_x vectorAdd [0,0,-
 private _endPieces = _nodes select {count get3DENConnections _x <= 1};
 {
     private _node = _x;
-    private _area = [_node, [_widthToObj*2, _widthToObj*2, 0, false]];
-    [_area, true, 0.5, 3] call TerrainLib_fnc_restoreTerrainHeight;
+    private _area = [_node, [_widthToEdge, _widthToEdge, 0, true]];
+    [_area, true, 1, 0] call TerrainLib_fnc_restoreTerrainHeight;
 } forEach _endPieces;

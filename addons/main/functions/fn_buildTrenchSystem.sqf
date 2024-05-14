@@ -45,7 +45,7 @@ private _terrainPoints = [];
     private _sinDir = sin _dir;
     private _dist = _startPos distance2D _endPos;
     private _numSegments = ceil (_dist / _segmentLength);
-    private _extraSegments = ceil (_widthToObj / 1.5 / _segmentLength); // So we cover the ends
+    private _extraSegments = ceil (_widthToObj / 1.42 / _segmentLength); // So we cover the ends
     private _segmentOffset = (_endPos vectorDiff _startPos) vectorMultiply (1 / _numSegments);
     private _halfSegmentOffset = _segmentOffset vectorMultiply 0.5;
     // Offset to the centre of the object forming trench wall, multiplier for rolls, 
@@ -70,7 +70,7 @@ private _terrainPoints = [];
         _cosDir * _widthToEdge, 
         _sinDir * -_widthToEdge, 
         0
-    ],
+    ];
     private _offsetRightEdge = [
         _cosDir * -_widthToEdge, 
         _sinDir * _widthToEdge, 
@@ -78,7 +78,6 @@ private _terrainPoints = [];
     ];
     for "_i" from (-_extraSegments) to (_numSegments+_extraSegments) do {
         private _centerLine = _startPos vectorAdd (_segmentOffset vectorMultiply _i);
-        private _next = _centerLine vectorAdd _segmentOffset;
         private _segmentStartPos = _centerLine vectorAdd (_halfSegmentOffset vectorMultiply -1);
         private _segmentEndPos = _centerLine vectorAdd _halfSegmentOffset;
         private _currentHeight = selectMin ([_offsetLeftEdge, _offsetRightEdge] apply {
@@ -96,7 +95,7 @@ private _terrainPoints = [];
             private _posASL = _centerLine vectorAdd _offset;
             // private _fall = (getTerrainHeightASL (_posASL vectorAdd _toEnd)) - (getTerrainHeightASL (_posASL vectorAdd _toStart));
             // private _roll = asin ((_fall / (_segmentLength)) min 1);
-            _posASL set [2, _currentHeight - _segmentSlopeBottom];
+            _posASL set [2, (_currentHeight + _nextHeight)/2 - _segmentSlopeBottom];
             private _pieceRoll = _roll * -_multiplier;
             // The gradient of the segment pieces is actually 90 degrees to the direction of the trench, so we need to rotate it.
             private _vectorDirAndUp = [
@@ -108,7 +107,7 @@ private _terrainPoints = [];
 
         // Terrain modification areas
         if (_i >= 0 && _i < _numSegments) then {
-            [_centerLine, _terrainPoints, _widthToEdge, _segmentLength, _dir, _next, _currentHeight, _nextHeight, _trueDepth] call trencher_main_fnc_getTerrainModPoints;
+            [_centerLine, _segmentEndPos, _terrainPoints, _widthToEdge, _widthToObj, _segmentLength, _dir, _currentHeight, _nextHeight, _trueDepth] call trencher_main_fnc_getTerrainModPoints;
         };
     };
 
@@ -116,6 +115,6 @@ private _terrainPoints = [];
 } forEach _pairs;
 
 // Handle terrain
-[_origin, _nodes, _terrainPoints, _widthToObj] call trencher_main_fnc_handleTerrain;
+[_origin, _nodes, _terrainPoints, _widthToEdge] call trencher_main_fnc_handleTerrain;
 // Handle objects
 [_origin, _toPlace, _interSectionAreas, _segmentLength, _hiddenObjects] call trencher_main_fnc_handleObjects;
