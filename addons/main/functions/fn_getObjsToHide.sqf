@@ -1,3 +1,4 @@
+#include "script_component.hpp"
 params ["_startPos", "_endPos", "_widthToObj", "_dist", "_dir", "_interSectionAreas", "_hiddenObjects"];
 // Area below the trench you can actually walk in
 private _centre = _startPos vectorAdd _endPos vectorMultiply 0.5;

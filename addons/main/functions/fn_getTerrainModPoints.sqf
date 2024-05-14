@@ -1,3 +1,4 @@
+#include "script_component.hpp"
 params ["_centerLine", "_segmentEnd", "_terrainPoints", "_distToEdge", "_distToObjCentre", "_segmentLength", "_dir", "_currentHeight", "_nextHeight", "_trueDepth"];
 private _modifyArea = [_centerLine, _distToEdge, _segmentLength, _dir, true, -1];
 private _cellSize = (getTerrainInfo)#2;

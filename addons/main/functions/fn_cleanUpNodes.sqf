@@ -1,3 +1,4 @@
+#include "script_component.hpp"
 // Deletes all trench pieces and restores terrain to original height.
 params ["_nodes"];
 {

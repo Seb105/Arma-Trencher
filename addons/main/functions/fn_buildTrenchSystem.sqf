@@ -1,7 +1,8 @@
+#include "script_component.hpp"
 params ["_origin"];
-([_origin] call trencher_main_fnc_uniquePairs) params ["_nodes", "_pairs"];
+([_origin] call FUNC(uniquePairs) params ["_nodes", "_pairs"];
 // Cleanup existing objs 
-[_nodes] call trencher_main_fnc_cleanUpNodes;
+[_nodes] call FUNC(cleanUpNodes);
 if (count _nodes < 2) exitwith {};
 _controllers = _nodes select {_x isKindOf "trencher_main_Module_TrenchController"};
 if (count _controllers > 1) exitwith {
@@ -107,14 +108,14 @@ private _terrainPoints = [];
 
         // Terrain modification areas
         if (_i >= 0 && _i < _numSegments) then {
-            [_centerLine, _segmentEndPos, _terrainPoints, _widthToEdge, _widthToObj, _segmentLength, _dir, _currentHeight, _nextHeight, _trueDepth] call trencher_main_fnc_getTerrainModPoints;
+            [_centerLine, _segmentEndPos, _terrainPoints, _widthToEdge, _widthToObj, _segmentLength, _dir, _currentHeight, _nextHeight, _trueDepth] call FUNC(getTerrainModPoints);
         };
     };
 
-    [_startPos, _endPos, _widthToObj, _dist, _dir, _interSectionAreas, _hiddenObjects] call trencher_main_fnc_getObjsToHide;
+    [_startPos, _endPos, _widthToObj, _dist, _dir, _interSectionAreas, _hiddenObjects] call FUNC(getObjsToHide);
 } forEach _pairs;
 
 // Handle terrain
-[_origin, _nodes, _terrainPoints, _widthToEdge] call trencher_main_fnc_handleTerrain;
+[_origin, _nodes, _terrainPoints, _widthToEdge] call FUNC(handleTerrain);
 // Handle objects
-[_origin, _toPlace, _interSectionAreas, _segmentLength, _hiddenObjects] call trencher_main_fnc_handleObjects;
+[_origin, _toPlace, _interSectionAreas, _segmentLength, _hiddenObjects] call FUNC(handleObjects);

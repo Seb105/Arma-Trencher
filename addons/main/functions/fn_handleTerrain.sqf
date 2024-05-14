@@ -1,3 +1,4 @@
+#include "script_component.hpp"
 params ["_origin", "_nodes", "_terrainPoints", "_widthToEdge"];
 // Iterate through and remove duplicatge [x,y] points, keeping the lowest z
 private _terrainPointsFiltered = [];

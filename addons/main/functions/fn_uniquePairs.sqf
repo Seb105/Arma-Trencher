@@ -1,7 +1,8 @@
+#include "script_component.hpp"
 // Walks over trench pieces and returns an array of unique pairs of connected trench pieces
 params ["_origin"];
 private _pairs = [];
-private _nodes = [_origin] call trencher_main_fnc_connectedTrenchPieces;
+private _nodes = [_origin] call FUNC(connectedTrenchPieces);
 {
     private _node = _x;
     private _connections = get3DENConnections _node apply {_x#1};

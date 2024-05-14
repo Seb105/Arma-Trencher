@@ -1,3 +1,4 @@
+#include "script_component.hpp"
 // Walks over all connected trench pieces and returns them in an array
 params ["_origin"];
 private _toVisit = get3DENConnections _origin apply {_x#1};

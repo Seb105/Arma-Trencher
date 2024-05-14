@@ -1,3 +1,4 @@
+#include "script_component.hpp"
 params ["_origin", "_toPlace", "_interSectionAreas", "_segmentLength", "_hiddenObjects"];
 // Hide objects
 {
