@@ -17,7 +17,7 @@ private _terrainPointsFiltered = [];
 _origin setVariable ["points", _terrainPoints];
 
 // Subtract the depth of trench
-private _terrainPointsSub = _terrainPointsFiltered;// apply {_x vectorAdd [0,0,-_trueDepth]}; 
+private _terrainPointsSub = _terrainPointsFiltered;
 [_terrainPointsSub, true, true] call TerrainLib_fnc_setTerrainHeight;
 // Restore end piece to blend transition
 private _endPieces = _nodes select {count get3DENConnections _x <= 1};

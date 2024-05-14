@@ -1,6 +1,6 @@
 #include "script_component.hpp"
 params ["_origin"];
-([_origin] call FUNC(uniquePairs) params ["_nodes", "_pairs"];
+([_origin] call FUNC(uniquePairs)) params ["_nodes", "_pairs"];
 // Cleanup existing objs 
 [_nodes] call FUNC(cleanUpNodes);
 if (count _nodes < 2) exitwith {};

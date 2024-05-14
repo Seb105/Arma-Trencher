@@ -8,7 +8,11 @@ class CfgPatches
         units[] = {};
         weapons[] = {};
         requiredVersion = REQUIRED_VERSION;
-        requiredAddons[] = {};
+        requiredAddons[] = {
+            "cba_main",
+            "TerrainLib_main",
+            "Peer_Trenches_Vehicles"
+        };
         author = "Seb";
         VERSION_CONFIG;
     };
@@ -70,10 +74,11 @@ class CfgVehicles
         isTriggerActivated = 0;
         isDisposable = 0;
         is3DEN = 1;
-        
+        icon =  "\a3\Missions_F_Beta\data\img\iconMPTypeDefense_ca.paa";
     };
     class GVAR(Module_TrenchController): GVAR(Module_TrenchPiece) {
         displayName = "Trench Controller";
+        icon = "A3\Modules_F_Tacops\Data\CivilianPresence\icon32_ca.paa";
         class Arguments
         {
             class TrenchDepth
