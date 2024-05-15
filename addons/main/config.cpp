@@ -31,6 +31,7 @@ class CfgFunctions
             class connectedTrenchPieces {};
             class getObjsToHide {};
             class getTerrainModPoints {};
+            class handleObjectAdditions {};
             class handleObjects {};
             class handleTerrain {};
             class onEntityAdded {};
@@ -111,12 +112,33 @@ class CfgVehicles
                 typeName = "NUMBER";
                 defaultValue = "0";
             };
-            class DoConcrete 
+            class WallType 
             {
-                displayName = "Concrete Wall";
-                description = "Reinforce the trench with concrete walls";
-                typeName = "BOOL";
-                defaultValue = "false";
+                displayName = "Wall Type";
+                description = "Reinforce the trench wall with one of the folowing";
+                class Values {
+                    // Note: values are parsed as strings in game
+                    class None {
+                        default = 1;
+                        name = "None";
+                        value = -1;
+                    };
+                    class Concrete {
+                        default = 0;
+                        name = "Concrete";
+                        value = 0;
+                    };
+                    class Wood {
+                        default = 0;
+                        name = "Wood";
+                        value = 1;
+                    };
+                    class Metal {
+                        default = 0;
+                        name = "Metal";
+                        value = 2;
+                    };
+                };
             };
             class DoSandbags 
             {

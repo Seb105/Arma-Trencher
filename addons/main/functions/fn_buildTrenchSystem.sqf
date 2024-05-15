@@ -4,7 +4,7 @@ params ["_origin"];
 // Cleanup existing objs 
 [_nodes] call FUNC(cleanUpNodes);
 if (count _nodes < 2) exitwith {};
-_controllers = _nodes select {_x isKindOf "trencher_main_Module_TrenchController"};
+private _controllers = _nodes select {_x isKindOf "trencher_main_Module_TrenchController"};
 if (count _controllers > 1) exitwith {
     ["A trench can only have 1 controller module synced", 1, 5, true, 0.2] call BIS_fnc_3DENNotification
 };
@@ -46,8 +46,14 @@ private _terrainPoints = [];
     private _cosDir = cos _dir;
     private _sinDir = sin _dir;
     private _dist = _startPos distance2D _endPos;
-    private _numSegments = ceil (_dist / _segmentLength);
-    private _extraSegments = ceil (_widthToObj / 1.42 / _segmentLength); // So we cover the ends
+    private _numSegments = floor (_dist / _segmentLength);
+    
+    // Extra segments to connnect trenches that are at angles to eachother
+    private _startMaxAngle = _startNode getVariable "maxAngle";
+    private _endMaxAngle = _endNode getVariable "maxAngle";
+	private _extraSegmentsStart = abs floor (((_trenchWidth/2) / (tan (_startMaxAngle/2))/_segmentLength));
+	private _extraSegmentsEnd = abs floor (((_trenchWidth/2) / (tan (_endMaxAngle/2))/_segmentLength));
+
     private _segmentOffset = (_endPos vectorDiff _startPos) vectorMultiply (1 / _numSegments);
     private _halfSegmentOffset = _segmentOffset vectorMultiply 0.5;
     // Offset to the centre of the object forming trench wall, multiplier for rolls, 
@@ -78,7 +84,7 @@ private _terrainPoints = [];
         _sinDir * _widthToEdge, 
         0
     ];
-    for "_i" from (-_extraSegments) to (_numSegments+_extraSegments) do {
+    for "_i" from (-_extraSegmentsStart) to (_numSegments+_extraSegmentsEnd) do {
         private _centerLine = _startPos vectorAdd (_segmentOffset vectorMultiply _i);
         private _segmentStartPos = _centerLine vectorAdd (_halfSegmentOffset vectorMultiply -1);
         private _segmentEndPos = _centerLine vectorAdd _halfSegmentOffset;
@@ -107,9 +113,9 @@ private _terrainPoints = [];
         } forEach [_offsetLeft, _offsetRight];
 
         // Terrain modification areas
-        if (_i >= 0 && _i < _numSegments) then {
-            [_centerLine, _segmentEndPos, _terrainPoints, _widthToEdge, _widthToObj, _segmentLength, _dir, _currentHeight, _nextHeight, _trueDepth] call FUNC(getTerrainModPoints);
-        };
+        // if (_i >= 0 && _i < _numSegments) then {
+        [_centerLine, _segmentEndPos, _terrainPoints, _widthToEdge, _widthToObj, _segmentLength, _dir, _currentHeight, _nextHeight, _trueDepth] call FUNC(getTerrainModPoints);
+        // };
     };
 
     [_startPos, _endPos, _widthToObj, _dist, _dir, _interSectionAreas, _hiddenObjects] call FUNC(getObjsToHide);
@@ -119,8 +125,13 @@ private _terrainPoints = [];
 private _blendTrenchEnds = _controller getVariable "BlendEnds";
 [_origin, _nodes, _terrainPoints, _widthToEdge, _blendTrenchEnds] call FUNC(handleTerrain);
 // Handle objects
-private _doConcrete = _controller getVariable "DoConcrete";
+private _trenchPieces = [_origin, _toPlace, _interSectionAreas, _segmentLength, _hiddenObjects] call FUNC(handleObjects);
+// Handle object additions
+private _wallType = parseNumber (_controller getVariable "WallType"); // Config values are strings
 private _doSandbags = _controller getVariable "DoSandbags";
 private _doBarbedWire = _controller getVariable "DoBarbedWire";
-private _extraComponents = [_doConcrete, _doSandbags, _doBarbedWire];
-[_origin, _toPlace, _interSectionAreas, _segmentLength, _hiddenObjects, _extraComponents] call FUNC(handleObjects);
+private _extraComponents = [_wallType, _doSandbags, _doBarbedWire];
+// Copy arr to avoid modififying whilst iterating
+(+_trenchPieces) apply {
+    [_x, _trenchPieces, _extraComponents] call FUNC(handleObjectAdditions);
+};
