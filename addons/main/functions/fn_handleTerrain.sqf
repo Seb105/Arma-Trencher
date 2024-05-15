@@ -1,5 +1,5 @@
 #include "script_component.hpp"
-params ["_origin", "_nodes", "_terrainPoints", "_widthToEdge"];
+params ["_origin", "_nodes", "_terrainPoints", "_widthToEdge", "_blendTrenchEnds"];
 // Iterate through and remove duplicatge [x,y] points, keeping the lowest z
 private _terrainPointsFiltered = [];
 {
@@ -20,6 +20,7 @@ _origin setVariable ["points", _terrainPoints];
 private _terrainPointsSub = _terrainPointsFiltered;
 [_terrainPointsSub, true, true] call TerrainLib_fnc_setTerrainHeight;
 // Restore end piece to blend transition
+if !(_blendTrenchEnds) exitWith {};
 private _endPieces = _nodes select {count get3DENConnections _x <= 1};
 {
     private _node = _x;

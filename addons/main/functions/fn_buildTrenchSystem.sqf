@@ -15,6 +15,7 @@ private _cellSize = (getTerrainInfo)#2;
 private _controller = _controllers#0;
 private _depth = _controller getVariable "TrenchDepth";
 private _trenchWidth = _controller getVariable "TrenchWidth";
+private _pitch = _controller getVariable "TrenchPitch"; // SLope of the trench walls
 private _minTrenchWidth = (_cellSize/2) * (sqrt 2);
 if (_trenchWidth < _minTrenchWidth) then {
     _trenchWidth = _minTrenchWidth;
@@ -89,7 +90,6 @@ private _terrainPoints = [];
         });
         private _fall = _nextHeight - _currentHeight;
         private _roll = asin ((_fall / (_segmentLength)) min 1); // Errors if fall is too steep
-        private _pitch = 0;
         {
             _x params ["_offset", "_multiplier"];
             private _pieceDir = _dir - 90 * _multiplier;
@@ -116,6 +116,11 @@ private _terrainPoints = [];
 } forEach _pairs;
 
 // Handle terrain
-[_origin, _nodes, _terrainPoints, _widthToEdge] call FUNC(handleTerrain);
+private _blendTrenchEnds = _controller getVariable "BlendEnds";
+[_origin, _nodes, _terrainPoints, _widthToEdge, _blendTrenchEnds] call FUNC(handleTerrain);
 // Handle objects
-[_origin, _toPlace, _interSectionAreas, _segmentLength, _hiddenObjects] call FUNC(handleObjects);
+private _doConcrete = _controller getVariable "DoConcrete";
+private _doSandbags = _controller getVariable "DoSandbags";
+private _doBarbedWire = _controller getVariable "DoBarbedWire";
+private _extraComponents = [_doConcrete, _doSandbags, _doBarbedWire];
+[_origin, _toPlace, _interSectionAreas, _segmentLength, _hiddenObjects, _extraComponents] call FUNC(handleObjects);

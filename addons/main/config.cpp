@@ -86,7 +86,6 @@ class CfgVehicles
             class TrenchDepth
             {
                 displayName = "Depth";
-                property = "TrenchDepth";
                 description = "Depth of the upper lip of the trench to the bottom";
                 typeName = "NUMBER";
                 defaultValue = "2";
@@ -94,10 +93,44 @@ class CfgVehicles
             class TrenchWidth
             {
                 displayName = "Width";
-                property = "TrenchWidth";
                 description = "Width of the trench";
                 typeName = "NUMBER";
                 defaultValue = "4";
+            };
+            class BlendEnds
+            {
+                displayName = "Blend Ends";
+                description = "Blend the ends of the trench into the terrain";
+                typeName = "BOOL";
+                defaultValue = "true";
+            };
+            class TrenchPitch
+            {
+                displayName = "Pitch";
+                description = "Angle of trench wall";
+                typeName = "NUMBER";
+                defaultValue = "0";
+            };
+            class DoConcrete 
+            {
+                displayName = "Concrete Wall";
+                description = "Reinforce the trench with concrete walls";
+                typeName = "BOOL";
+                defaultValue = "false";
+            };
+            class DoSandbags 
+            {
+                displayName = "Sandbags";
+                description = "Add sandbags to lip of trench";
+                typeName = "BOOL";
+                defaultValue = "false";
+            };
+            class DoBarbedWire 
+            {
+                displayName = "Barbed Wire";
+                description = "Add barbed wire to lip of trench";
+                typeName = "BOOL";
+                defaultValue = "false";
             };
         };
     };
