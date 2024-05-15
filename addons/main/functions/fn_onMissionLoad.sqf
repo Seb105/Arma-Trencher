@@ -1,10 +1,8 @@
 #include "script_component.hpp"
-systemchat "Trenches loaded 1";
 [] spawn {
-    // retard script wont work right at mission start
-    waitUntil {missionNameSpace getVariable ["BIS_fnc_init", false]};
+    // retard script wont work right at mission load unless i do this shit
+    waitUntil {time > 1};
     isNil {
-        systemChat "Trenches loaded 2";
         private _allTrenchNetworks = call FUNC(allTrenchNetworks);
         {
             private _origin = _x#0;
