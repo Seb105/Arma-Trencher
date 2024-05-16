@@ -1,5 +1,6 @@
-params ["_origin", "_toPlace", "_interSectionAreas", "_segmentLength", "_hiddenObjects", "_extraComponents"];
+params ["_origin", "_toPlace", "_interSectionAreas", "_segmentLength", "_hiddenObjects"];
 // Hide objects
+_hiddenObjects = _hiddenObjects arrayIntersect _hiddenObjects;
 {
     _x hideObjectGlobal true;
 } forEach _hiddenObjects;
@@ -7,12 +8,13 @@ _origin setVariable ["hiddenObjects", _hiddenObjects];
 
 // Place objects
 private _trenchPieces = _origin getVariable "trenchPieces"; // By reference
-// Remove objets that are intersecting with the trench walkable area
+// Remove objects that are intersecting with the trench walkable area
 private _notIntersecting = _toPlace select {
     private _objPos = (_x#0);
     _interSectionAreas findIf {_objPos inArea _x} isEqualTo -1
 };
 private _toPlaceFinal = [];
+// Remove objects that are too close to each other by averaging their positions and directions
 private _threshholdDist = _segmentLength/(1.5);
 while {count _notIntersecting > 0} do {
     // Find nearby objects to this object

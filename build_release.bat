@@ -1,1 +1,2 @@
 hemtt.exe release
+PAUSE

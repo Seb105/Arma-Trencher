@@ -23,7 +23,7 @@ if (_trenchWidth < _minTrenchWidth) then {
     [_msg, 0, 5, true, 0] call BIS_fnc_3DENNotification;
 };
 // Create new objs
-private _segmentLength = 6;
+private _segmentLength = 7;
 private _segmentWidth = 9; // Width of bounding box
 private _segmentSlopeBottom = 2.2;
 private _segmentSlopeTop = 2.6;
@@ -36,6 +36,7 @@ private _interSectionAreas = [];
 private _hiddenObjects = [];
 private _terrainPoints = [];
 // Build list of objects to place
+private _piecesDontPlace =  0 max (floor (_trenchWidth/_segmentLength) - 1);
 {
     _x params ["_startNode", "_endNode"];
     private _startPos = getPosASL _startNode;
@@ -46,13 +47,15 @@ private _terrainPoints = [];
     private _cosDir = cos _dir;
     private _sinDir = sin _dir;
     private _dist = _startPos distance2D _endPos;
-    private _numSegments = floor (_dist / _segmentLength);
+    private _numSegments = ceil (_dist / _segmentLength);
     
     // Extra segments to connnect trenches that are at angles to eachother
-    private _startMaxAngle = _startNode getVariable "maxAngle";
-    private _endMaxAngle = _endNode getVariable "maxAngle";
-	private _extraSegmentsStart = abs floor (((_trenchWidth/2) / (tan (_startMaxAngle/2))/_segmentLength));
-	private _extraSegmentsEnd = abs floor (((_trenchWidth/2) / (tan (_endMaxAngle/2))/_segmentLength));
+    // private _startMaxAngle = _startNode getVariable "maxAngle";
+    // private _endMaxAngle = _endNode getVariable "maxAngle";
+    // private _extraSegmentsStart = abs round (((_trenchWidth/2) / (tan (_startMaxAngle/2))/_segmentLength));
+    // private _extraSegmentsEnd = abs round (((_trenchWidth/2) / (tan (_endMaxAngle/2))/_segmentLength));
+    private _extraSegmentsStart = 0;
+    private _extraSegmentsEnd = 0;
 
     private _segmentOffset = (_endPos vectorDiff _startPos) vectorMultiply (1 / _numSegments);
     private _halfSegmentOffset = _segmentOffset vectorMultiply 0.5;
@@ -84,7 +87,7 @@ private _terrainPoints = [];
         _sinDir * _widthToEdge, 
         0
     ];
-    for "_i" from (-_extraSegmentsStart) to (_numSegments+_extraSegmentsEnd) do {
+    for "_i" from (_piecesDontPlace) to (_numSegments-_piecesDontPlace) do {
         private _centerLine = _startPos vectorAdd (_segmentOffset vectorMultiply _i);
         private _segmentStartPos = _centerLine vectorAdd (_halfSegmentOffset vectorMultiply -1);
         private _segmentEndPos = _centerLine vectorAdd _halfSegmentOffset;
@@ -118,9 +121,63 @@ private _terrainPoints = [];
         // };
     };
 
-    [_startPos, _endPos, _widthToObj, _dist, _dir, _interSectionAreas, _hiddenObjects] call FUNC(getObjsToHide);
+    // Area below the trench you can actually walk in
+    private _centre = _startPos vectorAdd _endPos vectorMultiply 0.5;
+    private _trenchArea = [_centre, _widthToObj/1.2, _dist/2, _dir, true, -1];
+    _interSectionAreas pushBack _trenchArea;
+    private _objsToHide = [_centre, _dist, _trenchArea] call FUNC(getObjsToHide);
+    _hiddenObjects append _objsToHide;
 } forEach _pairs;
 
+private _needsCircles = _nodes select {
+    count get3DENConnections _x > 1
+    //&& _x getVariable "maxAngle" < 90
+};
+_needsCircles apply {
+    private _node = _x;
+    private _radius = _trenchWidth/2;
+    private _radiusToObj = _radius+_segmentWidth/2;
+    private _radiusToEdge = _radius+_segmentWidth;
+    private _pos = getPosASL _node;    
+    private _modifyArea = [_pos, _radiusToEdge, _radiusToEdge, 0, false];
+    private _lowerArea = [_pos, (_radiusToEdge-_cellSize), (_radiusToEdge-_cellSize), 0, false];
+    private _trenchArea = [_pos, _radiusToObj/1.01, _radiusToObj/1.01, 0, false, -1];
+    _interSectionAreas pushBack _trenchArea;
+    private _points = [_modifyArea] call terrainlib_fnc_getAreaTerrainGrid;
+    private _minZ = selectMin (_points apply {_x#2});
+    //private _minZ = (getTerrainHeightASL _pos);
+    _points apply {
+        private _sub = [0, _trueDepth] select (_x inArea _lowerArea);
+        _x set [2, _minZ - _sub];
+    };
+    _pos set [2, _minZ];
+    _terrainPoints append _points;
+
+    private _objsToHide = [_pos, _radius, _modifyArea] call FUNC(getObjsToHide);
+    _hiddenObjects append _objsToHide;
+    
+    
+    private _objCircumference = 2 * pi * _radius;
+    private _numObjs = ceil (_objCircumference / _segmentLength);
+    private _angleStep = 360 / _numObjs;
+    for "_i" from 0 to (_numObjs - 1) do {
+        private _angle = _angleStep * _i;
+        private _offset = [
+            (sin _angle) * _radiusToObj,
+            (cos _angle) * _radiusToObj,
+            -_segmentSlopeBottom
+        ];
+        //systemChat str _offset;
+        private _posASL = _pos vectorAdd _offset;
+        private _pieceDir = _angle - 180;
+        private _pieceRoll = 0;
+        private _vectorDirAndUp = [
+            [sin _pieceDir * cos _pitch, cos _pieceDir * cos _pitch, sin _pitch],
+            [[sin _pieceRoll, -sin _pitch, cos _pieceRoll * cos _pitch], -_pieceDir] call BIS_fnc_rotateVector2D
+        ];
+        _toPlace pushBack [_posASL, _vectorDirAndUp];
+    };
+};
 // Handle terrain
 private _blendTrenchEnds = _controller getVariable "BlendEnds";
 [_origin, _nodes, _terrainPoints, _widthToEdge, _blendTrenchEnds] call FUNC(handleTerrain);
