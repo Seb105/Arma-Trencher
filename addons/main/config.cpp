@@ -154,6 +154,13 @@ class CfgVehicles
                 typeName = "BOOL";
                 defaultValue = "false";
             };
+            class AdditionalHorizSegments
+            {
+                displayName = "Extra Horizontal Segments";
+                description = "Extend the trench slope with additional horizontal segments. Good for terrains with large cell sizes";
+                typeName = "NUMBER";
+                defaultValue = "0";
+            };
         };
     };
 };

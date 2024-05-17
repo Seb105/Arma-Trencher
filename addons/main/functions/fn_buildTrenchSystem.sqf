@@ -153,8 +153,8 @@ _needsConnecting apply {
         // Terrain stuff
     private _search = _widthToEdge;
     private _modifyArea = [_nodePos, _search, _search, 0, false];
-    private _trenchArea = [_nodePos, _trenchWidth, _trenchWidth, 0, false, -1];
-    _interSectionAreas pushBack _trenchArea;
+    // private _trenchArea = [_nodePos, _trenchWidth/2, _trenchWidth/2, 0, false, -1];
+    // _interSectionAreas pushBack _trenchArea;
     private _points = [_modifyArea] call terrainlib_fnc_getAreaTerrainGrid;
     private _minZ = selectMin (_points apply {
         _x#2
