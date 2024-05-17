@@ -125,9 +125,7 @@ for "_i" from (0) to (_numSegments) do {
     } forEach [_offsetLeft, _offsetRight];
 
     // Terrain modification areas
-    // if (_i >= 0 && _i < _numSegments) then {
     [_centerLine, _segmentEndPos, _terrainPoints, _widthToEdge, _widthToObj, _segmentLength, _dir, _currentHeight, _nextHeight, _trueDepth] call trencher_main_fnc_getTerrainModPoints;
-    // };
 };
 
 // Area below the trench you can actually walk in
@@ -139,155 +137,152 @@ _hiddenObjects append _objsToHide;
 } forEach _pairs;
 
 private _needsConnecting = _nodes select {
-count get3DENConnections _x > 1
+    count get3DENConnections _x > 1
 };
 clearRadio;
 SWEEPS = [];
 POINTS = [];
 _needsConnecting apply {
-private _node = _x;
-private _nodePos = getPosASL _node;
-_nodePos set [2,0];
-private _connections = [
-    (get3DENConnections _x) apply {_x#1}, 
-    [_node], 
-    {_input0 getDir _x},
-    "DESCEND"
-] call BIS_fnc_sortBy;
+    private _node = _x;
+    private _nodePos = getPosASL _node;
+    _nodePos set [2,0];
+    private _connections = [
+        (get3DENConnections _x) apply {_x#1}, 
+        [_node], 
+        {_input0 getDir _x},
+        "DESCEND"
+    ] call BIS_fnc_sortBy;
 
 
-private _search = _widthToEdge;
-private _modifyArea = [_nodePos, _search, _search, 0, false];
-private _trenchArea = [_nodePos, _trenchWidth, _trenchWidth, 0, false, -1];
-//_interSectionAreas pushBack _trenchArea;
-private _points = [_modifyArea] call terrainlib_fnc_getAreaTerrainGrid;
-private _minZ = selectMin (_points apply {_x#2});
-//private _minZ = (getTerrainHeightASL _pos);
-_points apply {
-    _x set [2, _minZ - _trueDepth];
-};
-//_nodePos set [2, _minZ];
-_terrainPoints append _points;
-private _objsToHide = [_nodePos, _trenchWidth, _modifyArea] call trencher_main_fnc_getObjsToHide;
-_hiddenObjects append _objsToHide;    
-/**/ 
-
-
-private _numConnections = count _connections;    
-{
-    private _nextNodeIndex = _forEachIndex + 1;
-    if (_nextNodeIndex == _numConnections) then {_nextNodeIndex = 0};
-    private _nextNode = _connections#_nextNodeIndex;
-    private _prevNode = _x;
-    private _prevPos = getPosASL _prevNode;
-    private _nextPos = getPosASL _nextNode;
-    {_x set [2,0]} forEach [_prevPos, _nextPos]; 
-    //SWEEPS pushBack [_prevNode, _nextNode];
-    private _a1 = _prevNode getDir _node;
-    private _a2 = _node getDir _nextNode;
-private _relAngle = 180-(_a2 - _a1);
-    if (_relAngle < 0) then {
-        _relAngle = _relAngle + 360;
+    private _search = _widthToEdge;
+    private _modifyArea = [_nodePos, _search, _search, 0, false];
+    private _trenchArea = [_nodePos, _trenchWidth, _trenchWidth, 0, false, -1];
+    _interSectionAreas pushBack _trenchArea;
+    private _points = [_modifyArea] call terrainlib_fnc_getAreaTerrainGrid;
+    private _minZ = selectMin (_points apply {_x#2});
+    //private _minZ = (getTerrainHeightASL _pos);
+    _points apply {
+        _x set [2, _minZ - _trueDepth];
     };
-    if (_relAngle > 360) then {
-        _relAngle = _relAngle - 360;
-    };
-    //private _offsetDist = _widthToObj;///(sin (_relAngle/2));
-    //private _tangentNormal = (_a1 - _relAngle/2);
-    //systemChat str [_a1, _a2, _relAngle, _tangentNormal];
-    //private _tangent = _nodePos vectorAdd [
-        //-sin _tangentNormal * _widthToObj,
-        //-cos _tangentNormal * _widthToObj,
-        //0
-    //];
-    //SWEEPS pushBack [_nodePos,_tangent];
-    // Step along length of trench to the point the straights stop being generated
-    private _v1 = _nodePos vectorFromTo _prevPos;
-    private _v2 = _nodePos vectorFromTo _nextPos;
-    private _offsetDist = _widthToEdge/2;
-    //private _widthToIntersect = _widthToEdge - (_segmentWidth*1.5 * (cos (_relAngle/2)));
-    private _widthToInterSect = _widthToObj / (sin (_relAngle/2));
-    private _s1 = _nodePos vectorAdd (_v1 vectorMultiply _offsetDist);
-    private _s2 = _nodePos vectorAdd (_v2 vectorMultiply _offsetDist);
-    //SWEEPS pushback [_s1, _s2];
-    // Turn 90 degrees and step out. The path _o1 -> _o2 connects the trench ends.
-    private _r1 = _a1 + 90;
-    private _r2 = _a2 + 90;
-    private _o1 = _s1 vectorAdd [
-        sin _r1 * _widthToIntersect,
-        cos _r1 * _widthToIntersect,
-        0 
-    ];
-    private _o2 = _s2 vectorAdd [
-        sin _r2 * _widthToIntersect,
-        cos _r2 * _widthToIntersect,
-        0
-    ];
-    // If these 
-    private _d1 = _s1 getDir _s2;
-    private _d2 = _o1 getDir _o2;
-    //systemChat str [_d1, _d2];
-    private _distance = _o1 distance2D _o2;
-    private _pieceDir = _d2 - 90;
-    if (abs (_d1 - _d2) > 5) then {
-        //if (_distance > _chordLength) then {continue};
-        _pieceDir = _pieceDir + 180; 
-    };       
-    private _start = _o1;
-    private _end = _o2;
-    private _chordLength = _widthToObj + 2 * _segmentLength;
-    if (_distance > _chordLength) then {
-        private _over = (_distance - _chordLength)/2 + _segmentLength;
-        private _vectorDir = _start vectorFromTo _end;
-        _start = _o1 vectorAdd (_vectorDir vectorMultiply _over);
-        _end = _o2 vectorAdd (_vectorDIr vectorMultiply -_over);
-        _distance = _chordLength;
-    };
-    private _numSegments = ceil (_distance/_segmentLength);
-//        systemChat str _numSegments;
-    if (_numSegments < 1) then {continue};
-    private _segmentOffset = (_end vectorDiff _start) vectorMultiply (1/_numSegments);
-    private _halfSegmentOffset = _segmentOffset vectorMultiply 0.5;
-    private _halfWidth = _segmentWidth/2;
-    private _cosDir = cos _pieceDir;
-    private _sinDir = sin _pieceDir;
-    private _offsetEdge1 = [
-        _sinDir * (_widthToEdge + _halfWidth), 
-        _cosDir * (_widthToEdge + _halfWidth), 
-        0
-    ];
-    private _offsetEdge2 = [
-        -_sinDir * -_halfWidth, 
-        -_cosDir * _halfWidth, 
-        0
-    ];
-    _start = _start vectorAdd _segmentOffset;
-    systemchat str _numSegments;
-    for "_i" from (0) to (_numSegments-2) do {
-        private _centerLine = _start vectorAdd (_segmentOffset vectorMultiply _i);
-        private _segmentStartPos = _centerLine vectorAdd (_halfSegmentOffset vectorMultiply -1);
-        private _segmentEndPos = _centerLine vectorAdd _halfSegmentOffset;
-        private _currentHeight = selectMin ([_offsetEdge1, _offsetEdge2] apply {
-            //POINTS pushBack (_segmentStartPos vectorAdd _x);
-            getTerrainHeightASL (_segmentStartPos vectorAdd _x)
-        });
-        private _nextHeight = selectMin ([_offsetEdge1, _offsetEdge2] apply {
-            getTerrainHeightASL (_segmentEndPos vectorAdd _x)
-        });
-        private _fall = _nextHeight - _currentHeight;
-        private _pieceRoll = -asin ((_fall / (_segmentLength)) min 1); // Errors if fall is too steep
-        private _posASL = _centerLine;
-        _posASL set [2, (_currentHeight + _nextHeight)/2 - _segmentSlopeBottom];
-        private _vectorDirAndUp = [
-            [sin _pieceDir * cos _pitch, cos _pieceDir * cos _pitch, sin _pitch],
-            [[sin _pieceRoll, -sin _pitch, cos _pieceRoll * cos _pitch], -_pieceDir] call BIS_fnc_rotateVector2D
+
+    _terrainPoints append _points;
+    private _objsToHide = [_nodePos, _trenchWidth, _modifyArea] call trencher_main_fnc_getObjsToHide;
+    _hiddenObjects append _objsToHide;    
+
+    private _numConnections = count _connections;    
+    {
+        private _nextNodeIndex = _forEachIndex + 1;
+        if (_nextNodeIndex == _numConnections) then {_nextNodeIndex = 0};
+        private _nextNode = _connections#_nextNodeIndex;
+        private _prevNode = _x;
+        private _prevPos = getPosASL _prevNode;
+        private _nextPos = getPosASL _nextNode;
+        {_x set [2,0]} forEach [_prevPos, _nextPos]; 
+
+        private _a1 = _prevNode getDir _node;
+        private _a2 = _node getDir _nextNode;
+        // Angle between the two nodes. Will never be more than 180 degrees
+        private _relAngle = 180-(_a2 - _a1);
+        if (_relAngle < 0) then {
+            _relAngle = _relAngle + 360;
+        };
+        if (_relAngle > 360) then {
+            _relAngle = _relAngle - 360;
+        };
+        //private _offsetDist = _widthToObj;///(sin (_relAngle/2));
+        //private _tangentNormal = (_a1 - _relAngle/2);
+        //systemChat str [_a1, _a2, _relAngle, _tangentNormal];
+        //private _tangent = _nodePos vectorAdd [
+            //-sin _tangentNormal * _widthToObj,
+            //-cos _tangentNormal * _widthToObj,
+            //0
+        //];
+        // Step along length of trench to the point the straights stop being generated
+        private _v1 = _nodePos vectorFromTo _prevPos;
+        private _v2 = _nodePos vectorFromTo _nextPos;
+        private _offsetDist = _widthToEdge/2;
+        //private _widthToIntersect = _widthToEdge - (_segmentWidth*1.5 * (cos (_relAngle/2)));
+        private _widthToInterSect = _widthToObj / (sin (_relAngle/2));
+        private _s1 = _nodePos vectorAdd (_v1 vectorMultiply _offsetDist);
+        private _s2 = _nodePos vectorAdd (_v2 vectorMultiply _offsetDist);
+        //SWEEPS pushback [_s1, _s2];
+        // Turn 90 degrees and step out. The path _o1 -> _o2 connects the trench ends.
+        private _r1 = _a1 + 90;
+        private _r2 = _a2 + 90;
+        private _o1 = _s1 vectorAdd [
+            sin _r1 * _widthToIntersect,
+            cos _r1 * _widthToIntersect,
+            0 
         ];
-        _toPlace pushBack [_posASL, _vectorDirAndUp];
+        private _o2 = _s2 vectorAdd [
+            sin _r2 * _widthToIntersect,
+            cos _r2 * _widthToIntersect,
+            0
+        ];
+        // If these 
+        private _d1 = _s1 getDir _s2;
+        private _d2 = _o1 getDir _o2;
+        //systemChat str [_d1, _d2];
+        private _distance = _o1 distance2D _o2;
+        private _pieceDir = _d2 - 90;
+        if (abs (_d1 - _d2) > 5) then {
+            _pieceDir = _pieceDir + 180; 
+        };       
+        private _start = _o1;
+        private _end = _o2;
+        private _chordLength = _widthToObj + 2 * _segmentLength;
+        if (_distance > _chordLength) then {
+            private _over = (_distance - _chordLength)/2 + _segmentLength;
+            private _vectorDir = _start vectorFromTo _end;
+            _start = _o1 vectorAdd (_vectorDir vectorMultiply _over);
+            _end = _o2 vectorAdd (_vectorDIr vectorMultiply -_over);
+            _distance = _chordLength;
+        };
+        private _numSegments = ceil (_distance/_segmentLength);
+
+        if (_numSegments < 1) then {continue};
+        private _segmentOffset = (_end vectorDiff _start) vectorMultiply (1/_numSegments);
+        private _halfSegmentOffset = _segmentOffset vectorMultiply 0.5;
+        private _halfWidth = _segmentWidth/2;
+        private _cosDir = cos _pieceDir;
+        private _sinDir = sin _pieceDir;
+        private _offsetEdge1 = [
+            _sinDir * (_widthToEdge + _halfWidth), 
+            _cosDir * (_widthToEdge + _halfWidth), 
+            0
+        ];
+        private _offsetEdge2 = [
+            -_sinDir * -_halfWidth, 
+            -_cosDir * _halfWidth, 
+            0
+        ];
+        _start = _start vectorAdd _segmentOffset;
+        systemchat str _numSegments;
+        for "_i" from (0) to (_numSegments-2) do {
+            private _centerLine = _start vectorAdd (_segmentOffset vectorMultiply _i);
+            private _segmentStartPos = _centerLine vectorAdd (_halfSegmentOffset vectorMultiply -1);
+            private _segmentEndPos = _centerLine vectorAdd _halfSegmentOffset;
+            private _currentHeight = selectMin ([_offsetEdge1, _offsetEdge2] apply {
+                //POINTS pushBack (_segmentStartPos vectorAdd _x);
+                getTerrainHeightASL (_segmentStartPos vectorAdd _x)
+            });
+            private _nextHeight = selectMin ([_offsetEdge1, _offsetEdge2] apply {
+                getTerrainHeightASL (_segmentEndPos vectorAdd _x)
+            });
+            private _fall = _nextHeight - _currentHeight;
+            private _pieceRoll = -asin ((_fall / (_segmentLength)) min 1); // Errors if fall is too steep
+            private _posASL = _centerLine;
+            _posASL set [2, (_currentHeight + _nextHeight)/2 - _segmentSlopeBottom];
+            private _vectorDirAndUp = [
+                [sin _pieceDir * cos _pitch, cos _pieceDir * cos _pitch, sin _pitch],
+                [[sin _pieceRoll, -sin _pitch, cos _pieceRoll * cos _pitch], -_pieceDir] call BIS_fnc_rotateVector2D
+            ];
+            _toPlace pushBack [_posASL, _vectorDirAndUp];
+            //break;
+        };
         //break;
-    };
+    } forEach _connections;
     //break;
-} forEach _connections;
-//break;
 
 };
 // Handle terrain
