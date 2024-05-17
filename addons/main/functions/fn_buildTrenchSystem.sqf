@@ -35,7 +35,6 @@ private _toPlace = [];
 private _interSectionAreas = [];
 private _hiddenObjects = [];
 private _terrainPoints = [];
-private _edgePairs = [];
 // Build list of objects to place
 // private _piecesDontPlace =  0 max (floor (_widthToObj/_segmentLength) - 1);
 {
@@ -139,13 +138,12 @@ _hiddenObjects append _objsToHide;
 private _needsConnecting = _nodes select {
     count get3DENConnections _x > 1
 };
-clearRadio;
-SWEEPS = [];
-POINTS = [];
 _needsConnecting apply {
     private _node = _x;
     private _nodePos = getPosASL _node;
     _nodePos set [2,0];
+    // Sorting the connection means that any an angle drawn between two nodes that are next to eachother
+    // In this list will not sweep over another branch of the trench coming off this node
     private _connections = [
         (get3DENConnections _x) apply {_x#1}, 
         [_node], 
@@ -153,7 +151,7 @@ _needsConnecting apply {
         "DESCEND"
     ] call BIS_fnc_sortBy;
 
-
+    // Terrain stuff
     private _search = _widthToEdge;
     private _modifyArea = [_nodePos, _search, _search, 0, false];
     private _trenchArea = [_nodePos, _trenchWidth, _trenchWidth, 0, false, -1];
@@ -164,11 +162,11 @@ _needsConnecting apply {
     _points apply {
         _x set [2, _minZ - _trueDepth];
     };
-
     _terrainPoints append _points;
     private _objsToHide = [_nodePos, _trenchWidth, _modifyArea] call trencher_main_fnc_getObjsToHide;
     _hiddenObjects append _objsToHide;    
 
+    // Iterate over connections and build walls around the _interseciton
     private _numConnections = count _connections;    
     {
         private _nextNodeIndex = _forEachIndex + 1;
@@ -181,7 +179,7 @@ _needsConnecting apply {
 
         private _a1 = _prevNode getDir _node;
         private _a2 = _node getDir _nextNode;
-        // Angle between the two nodes. Will never be more than 180 degrees
+        // Angle between the two nodes, offset to always be 0-360
         private _relAngle = 180-(_a2 - _a1);
         if (_relAngle < 0) then {
             _relAngle = _relAngle + 360;
@@ -202,7 +200,7 @@ _needsConnecting apply {
         private _v2 = _nodePos vectorFromTo _nextPos;
         private _offsetDist = _widthToEdge/2;
         //private _widthToIntersect = _widthToEdge - (_segmentWidth*1.5 * (cos (_relAngle/2)));
-        private _widthToInterSect = _widthToObj / (sin (_relAngle/2));
+        private _widthToIntersect = _widthToObj / (sin (_relAngle/2));
         private _s1 = _nodePos vectorAdd (_v1 vectorMultiply _offsetDist);
         private _s2 = _nodePos vectorAdd (_v2 vectorMultiply _offsetDist);
         //SWEEPS pushback [_s1, _s2];
@@ -219,7 +217,9 @@ _needsConnecting apply {
             cos _r2 * _widthToIntersect,
             0
         ];
-        // If these 
+        // Path from _o1 -> _o2 is the trench wall. Path from _s1 -> _s2 the trench floor
+        // Path direction is tangent to the angle of the turn
+        // If  _d1 does not equal _d2, (minus float errors) then _o1 -> _o2 has become negative.
         private _d1 = _s1 getDir _s2;
         private _d2 = _o1 getDir _o2;
         //systemChat str [_d1, _d2];
@@ -230,16 +230,16 @@ _needsConnecting apply {
         };       
         private _start = _o1;
         private _end = _o2;
+        // _widthToIntersect approaches infinity as the relative angle approaches 360. Clamp it.
         private _chordLength = _widthToObj + 2 * _segmentLength;
         if (_distance > _chordLength) then {
             private _over = (_distance - _chordLength)/2 + _segmentLength;
             private _vectorDir = _start vectorFromTo _end;
             _start = _o1 vectorAdd (_vectorDir vectorMultiply _over);
-            _end = _o2 vectorAdd (_vectorDIr vectorMultiply -_over);
+            _end = _o2 vectorAdd (_vectorDir vectorMultiply -_over);
             _distance = _chordLength;
         };
         private _numSegments = ceil (_distance/_segmentLength);
-
         if (_numSegments < 1) then {continue};
         private _segmentOffset = (_end vectorDiff _start) vectorMultiply (1/_numSegments);
         private _halfSegmentOffset = _segmentOffset vectorMultiply 0.5;
@@ -257,7 +257,6 @@ _needsConnecting apply {
             0
         ];
         _start = _start vectorAdd _segmentOffset;
-        systemchat str _numSegments;
         for "_i" from (0) to (_numSegments-2) do {
             private _centerLine = _start vectorAdd (_segmentOffset vectorMultiply _i);
             private _segmentStartPos = _centerLine vectorAdd (_halfSegmentOffset vectorMultiply -1);
@@ -298,3 +297,4 @@ private _extraComponents = [_wallType, _doSandbags, _doBarbedWire];
 // Copy arr to avoid modififying whilst iterating
 (+_trenchPieces) apply {
 [_x, _trenchPieces, _extraComponents] call trencher_main_fnc_handleObjectAdditions;
+};
