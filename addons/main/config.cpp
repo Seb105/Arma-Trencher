@@ -26,7 +26,7 @@ class CfgFunctions
         {
             file = QPATHTOF(functions);
             class allTrenchNetworks {};
-            class buildTrenchSystem {};
+            // class buildTrenchSystem {};
             class cleanUpNodes {};
             class connectedTrenchPieces {};
             class getObjsToHide {};
