@@ -26,7 +26,7 @@ class CfgFunctions
         {
             file = QPATHTOF(functions);
             class allTrenchNetworks {};
-            // class buildTrenchSystem {};
+            class buildTrenchSystem {};
             class cleanUpNodes {};
             class connectedTrenchPieces {};
             class getObjsToHide {};
@@ -138,6 +138,17 @@ class CfgVehicles
                         name = "Metal";
                         value = 2;
                     };
+                    class Hesco {
+                        default = 0;
+                        name = "Hesco";
+                        value = 3;
+                    };
+                    class HescoRamp
+                    {
+                        default = 0;
+                        name = "Hesco (Ramp)";
+                        value = 4;
+                    };
                 };
             };
             class DoSandbags 
@@ -153,6 +164,29 @@ class CfgVehicles
                 description = "Add barbed wire to lip of trench";
                 typeName = "BOOL";
                 defaultValue = "false";
+            };
+            class TankTrapType 
+            {
+                displayName = "Tank traps";
+                description = "Add tank traps to lip of trench";
+                class Values {
+                    // Note: values are parsed as strings in game
+                    class None {
+                        default = 1;
+                        name = "None";
+                        value = -1;
+                    };
+                    class Hedgehog {
+                        default = 0;
+                        name = "Hedgehog";
+                        value = 0;
+                    };
+                    class DragonTeeth {
+                        default = 0;
+                        name = "Dragon Teeth";
+                        value = 1;
+                    };
+                };
             };
             class AdditionalHorizSegments
             {

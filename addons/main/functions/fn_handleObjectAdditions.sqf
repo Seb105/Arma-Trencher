@@ -1,46 +1,145 @@
 params ["_trenchPiece", "_trenchPieces", "_extraComponents"];
-_extraComponents params ["_wallType", "_doSandbags", "_doBarbedWire"];
+
+// Extra trench pieces to add due to height of trench
+private _wallPieces = [_trenchPiece];
+private _topSegmentHeight = (getPosASL _trenchPiece)#2 - 1.85;
+private _behindTrench = _trenchPiece modelToWorld [0,5,0];
+private _bottomHeight = getTerrainHeightASL _behindTrench;
+private _height = _topSegmentHeight - _bottomHeight;
+private _numExtraVertical = (ceil (_height / 4.457)) max 0;
+for "_i" from 1 to _numExtraVertical do {
+    private _relativePos = [0,0.368,-4.457] vectorMultiply _i;
+    private _dirAndUp = [[0,1,0],[0,0,1]] apply {
+        _trenchPiece vectorModelToWorld _x
+    };
+    private _posASL = _trenchPiece modelToWorldWorld _relativePos;
+    private _extraVertical = createSimpleObject ["Peer_Trench_Straight_Short_Chameleon", [0,0,0]];
+    _extraVertical setPosWorld _posASL;
+    _extraVertical setVectorDirAndUp _dirAndUp;
+    _extraVertical enableSimulationGlobal false;
+    _extraVertical setObjectTextureGlobal [0, (surfaceTexture _posASL)];
+    _extraVertical hideSelection ["snow", true];
+    _wallPieces pushBack _extraVertical;
+    _trenchPieces pushBack _extraVertical;
+};
+
+_extraComponents params ["_wallType", "_doSandbags", "_doBarbedWire", "_tankTrapType", "_additionalHorizontalPieces"];
 if (_wallType isNotEqualTo -1) then {
     private _types = [
+        // Concrete
         [
-            "Land_Bunker_01_blocks_3_F",
             [
-                [[1.58472,4.27881,0.666987],[[0,-1,0],[0,0,1]]],
-                [[-1.57422,4.27197,0.666987],[[0,-1,0],[0,0,1]]]
+                "Land_Mil_WallBig_4m_F",
+                [2.085,4.25,-0.402],
+                [[0,-0.999,-0.044],[0,-0.044,0.999]]
+            ],
+            [
+                "Land_Mil_WallBig_4m_battered_F",
+                [-1.853,4.25,-0.402],
+                [[0,-0.999,-0.044],[0,-0.044,0.999]]
+            ],
+            [
+                "Land_Mil_WallBig_Corner_F",
+                [-0.043,4.454,-0.402],
+                [[-0.707,0.703,0.077],[0,-0.109,0.994]]
             ]
         ],
+        // Frame
         [
-            "Land_TrenchFrame_01_F",
             [
-                [[1.87695,4.48779,0.667629],[[0,0.993379,0.114885],[0,-0.114885,0.993379]]],
-                [[-2.13794,4.50879,0.648629],[[0.000157269,0.998019,0.0629126],[0.0017975,0.0629122,-0.998017]]]
+                "Land_TrenchFrame_01_F",
+                [1.877,4.488,0.668],
+                [[0,0.993,0.115],[0,-0.115,0.993]]
+            ],
+            [
+                "Land_TrenchFrame_01_F",
+                [-2.425,4.492,0.649],
+                [[0,0.998,0.063],[0.002,0.063,-0.998]]
+            ],
+            [
+                "Land_TrenchFrame_01_F",
+                [1.888,4.727,-1.318],
+                [[0,0.998,0.063],[0.002,0.063,-0.998]]
+            ],
+            [
+                "Land_TrenchFrame_01_F",
+                [-2.213,4.72,-1.374],
+                [[0,0.993,0.115],[0,-0.115,0.993]]
             ]
         ],
+        // Tin
         [
-            "Land_TinWall_01_m_4m_v2_F",
             [
-                [[1.93701,4.6001,-0.622549],[[-0.000192014,-0.99494,-0.100466],[0,-0.100466,0.994941]]],
-                [[-2.01904,4.41113,0.980452],[[-0.000192014,-0.99494,-0.100466],[0,-0.100466,0.994941]]],
-                [[1.93701,4.43896,0.980452],[[-0.000192014,-0.99494,-0.100466],[0,-0.100466,0.994941]]],
-                [[-2.01904,4.56787,-0.622549],[[-0.000192014,-0.99494,-0.100466],[0,-0.100466,0.994941]]]
+                "Land_TinWall_01_m_4m_v2_F",
+                [1.937,4.6,-0.317],
+                [[0,-0.995,-0.1],[0,-0.1,0.995]]
+            ],
+            [
+                "Land_TinWall_01_m_4m_v2_F",
+                [-2.197,4.411,0.98],
+                [[0,-0.995,-0.1],[0,-0.1,0.995]]
+            ],
+            [
+                "Land_TinWall_01_m_4m_v2_F",
+                [1.937,4.439,0.98],
+                [[0,-0.995,-0.1],[0,-0.1,0.995]]
+            ],
+            [
+                "Land_TinWall_01_m_4m_v2_F",
+                [-2.197,4.568,-0.317],
+                [[0,-0.995,-0.1],[0,-0.1,0.995]]
+            ],
+            [
+                "Land_TinWall_01_m_4m_v2_F",
+                [-2.197,4.69,-1.624],
+                [[0,-0.995,-0.1],[0,-0.1,0.995]]
+            ],
+            [
+                "Land_TinWall_01_m_4m_v2_F",
+                [1.937,4.72,-1.624],
+                [[0,-0.995,-0.1],[0,-0.1,0.995]]
+            ]
+        ],
+        // Hescos
+        [
+            [
+                "Land_HBarrier_Big_F",
+                [-0.185,3.83,-1.499],
+                [[0,0.994,0.113],[0,-0.113,0.994]]
+            ],
+            [
+                "Land_HBarrier_Big_F",
+                [-0.185,3.579,0.823],
+                [[0,-0.994,-0.113],[0,-0.113,0.994]]
+            ]
+        ],
+        // Hesco (ramp)
+        [
+            [
+                "Land_HBarrierWall6_F",
+                [0,5.497,0.287],
+                [[0,-1,0],[0,0,1]]
             ]
         ]
     ];
-    (_types#_wallType) params ["_type", "_positions"];
-    _positions apply {
-        _x params ["_relativePos", "_relativeDirAndUp"];
-        private _posASL = _trenchPiece modelToWorldWorld _relativePos;
-        private _vectorDirAndUp = _relativeDirAndUp apply {_trenchPiece vectorModelToWorld _x};
-        private _concPiece = createSimpleObject [_type, _posASL];
-        _concPiece setPosWorld _posASL;
-        _concPiece setVectorDirAndUp _vectorDirAndUp;
-        _concPiece enableSimulationGlobal false;
-        _trenchPieces pushBack _concPiece;
+    private _wallObjs = _types#_wallType;
+    _wallObjs apply {
+        _x params ["_type", "_relativePos", "_relativeDirAndUp"];
+        _wallPieces apply {
+            private _wall = _x;
+            private _posASL = _wall modelToWorldWorld _relativePos;
+            private _vectorDirAndUp = _relativeDirAndUp apply {_wall vectorModelToWorld _x};
+            private _wallPiece = createSimpleObject [_type, _posASL];
+            _wallPiece setPosWorld _posASL;
+            _wallPiece setVectorDirAndUp _vectorDirAndUp;
+            _wallPiece enableSimulationGlobal false;
+            _trenchPieces pushBack _wallPiece;
+        };
     };
 };
 if (_doBarbedWire) then {
-    private _relativePos = [0,-0.23584,2.16478];
-    private _relativeDirAndUp = [[0,1,0],[0,0,1]];
+    private _relativePos = [0,1.113,2.348];
+    private _relativeDirAndUp = [[0,0.994,0.108],[0,-0.108,0.994]];
     private _posASL = _trenchPiece modelToWorldWorld _relativePos;
     private _vectorDirAndUp = _relativeDirAndUp apply {_trenchPiece vectorModelToWorld _x};
     // This object should be simulated so it can be destroyed
@@ -51,8 +150,24 @@ if (_doBarbedWire) then {
     _trenchPieces pushBack _barbedWire;
 };
 if (_doSandbags) then {
-    {
-        _x params ["_relativePos", "_relativeDirAndUp"];
+    [
+        [
+            "Land_BagFence_Long_F",
+            [2.37,4.053,2.32],
+            [[0,1,0],[0.06,0,0.998]]
+        ],
+        [
+            "Land_BagFence_Long_F",
+            [-0.474,4.053,2.419],
+            [[0,-1,0.007],[0.005,0.007,1]]
+        ],
+        [
+            "Land_BagFence_Long_F",
+            [-2.917,4.053,2.271],
+            [[0,1,0],[-0.148,0,0.989]]
+        ]
+    ] apply {
+        _x params ["_type", "_relativePos", "_relativeDirAndUp"];
         private _posASL = _trenchPiece modelToWorldWorld _relativePos;
         private _vectorDirAndUp = _relativeDirAndUp apply {_trenchPiece vectorModelToWorld _x};
         private _sandbag = createSimpleObject ["Land_BagFence_Long_F", _posASL];
@@ -60,9 +175,91 @@ if (_doSandbags) then {
         _sandbag setVectorDirAndUp _vectorDirAndUp;
         _sandbag enableSimulationGlobal false;
         _trenchPieces pushBack _sandbag;
-    } forEach [
-        [[2.56104,4.05273,2.23402],[[0,1,0],[0,0,1]]],
-        [[-0.236084,4.05273,2.23402],[[0,-1,0],[0,0,1]]],
-        [[-2.67896,4.05273,2.23402],[[0,1,0],[0,0,1]]]
-    ]
+    };
+};
+if (_tankTrapType isNotEqualTo -1) then {
+    private _types = [
+        [
+            [
+                "Land_CzechHedgehog_01_old_F",
+                [-2.759,-0.749,2.265],
+                [[0,1,0],[0,0,1]]
+            ],
+            [
+                "Land_CzechHedgehog_01_old_F",
+                [1.14,-0.785,2.133],
+                [[0,1,0],[0.11,0,0.994]]
+            ],
+            [
+                "Land_CzechHedgehog_01_old_F",
+                [-1.08,-2.739,1.948],
+                [[0,0.986,0.167],[-0.017,-0.166,0.986]]
+            ],
+            [
+                "Land_CzechHedgehog_01_old_F",
+                [2.812,-2.961,1.98],
+                [[0,1,0],[0,0,1]]
+            ]
+        ],
+        [
+            [
+                "Land_DragonsTeeth_01_1x1_old_F",
+                [-3.464,-0.684,2.158],
+                [[0.999,-0.048,0],[0,0,1]]
+            ],
+            [
+                "Land_DragonsTeeth_01_1x1_old_F",
+                [-0.683,-0.75,2.262],
+                [[0.999,-0.048,0],[0,0,1]]
+            ],
+            [
+                "Land_DragonsTeeth_01_1x1_old_F",
+                [2.087,-0.598,2.099],
+                [[0.999,-0.048,0],[0,0,1]]
+            ],
+            [
+                "Land_DragonsTeeth_01_1x1_old_F",
+                [-2.448,-2.011,2.017],
+                [[-0.508,-0.848,-0.152],[-0.017,-0.166,0.986]]
+            ],
+            [
+                "Land_DragonsTeeth_01_1x1_old_F",
+                [0.734,-2.237,2.049],
+                [[0.998,-0.049,-0.041],[0.041,-0.005,0.999]]
+            ],
+            [
+                "Land_DragonsTeeth_01_1x1_old_F",
+                [3.123,-2.34,1.948],
+                [[0.999,-0.048,0],[0,0,1]]
+            ]
+        ]
+    ];
+    private _tankTrapType = _types#_tankTrapType;
+    _tankTrapType apply {
+        _x params ["_type", "_relativePos", "_relativeDirAndUp"];
+        private _posASL = _trenchPiece modelToWorldWorld _relativePos;
+        private _vectorDirAndUp = _relativeDirAndUp apply {_trenchPiece vectorModelToWorld _x};
+        private _concPiece = createSimpleObject [_type, _posASL];
+        _concPiece setPosWorld _posASL;
+        _concPiece setVectorDirAndUp _vectorDirAndUp;
+        _concPiece enableSimulationGlobal false;
+        _trenchPieces pushBack _concPiece;
+    };
+};
+if (_additionalHorizontalPieces > 0) then {
+    for "_i" from 1 to _additionalHorizontalPieces do {
+        private _relativePos = [0,-8.155,-0.671] vectorMultiply _i;
+        private _dirAndUp = [[0,1,0],[0,0,1]] apply {
+            _trenchPiece vectorModelToWorld _x
+        };
+        private _posASL = _trenchPiece modelToWorldWorld _relativePos;
+        private _extraHorizontal = createSimpleObject ["Peer_Trench_Straight_Short_Chameleon", [0,0,0]];
+        _extraHorizontal setPosWorld _posASL;
+        _extraHorizontal setVectorDirAndUp _dirAndUp;
+        _extraHorizontal enableSimulationGlobal false;
+        _extraHorizontal setObjectTextureGlobal [0, (surfaceTexture _posASL)];
+        _extraHorizontal hideSelection ["snow", true];
+        // _wallPieces pushBack _extraHorizontal;
+        _trenchPieces pushBack _extraHorizontal;
+    };
 }

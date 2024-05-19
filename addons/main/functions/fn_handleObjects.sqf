@@ -14,42 +14,11 @@ private _notIntersecting = _toPlace select {
     _interSectionAreas findIf {_objPos inArea _x} isEqualTo -1
 };
 private _toPlaceFinal = _notIntersecting;
-// private _toPlaceFinal = [];
-// // Remove objects that are too close to each other by averaging their positions and directions
-// private _threshholdDist = _segmentLength/(3);
-// while {count _notIntersecting > 0} do {
-//     // Find nearby objects to this object
-//     private _objToPlace = (_notIntersecting#0);
-//     private _nearby = _notIntersecting select {
-//         (_objToPlace#0) distance (_x#0) < _threshholdDist
-//     };
-//     private _count = count _nearby;
-//     // Average their positions and directions
-//     _notIntersecting = _notIntersecting - _nearby;
-//     if (_count isEqualTo 1) then {
-//         _toPlaceFinal pushBack _objToPlace;
-//         continue;
-//     };
-//     private _pos = [0,0,0];
-//     _nearby apply {_pos = _pos vectorAdd _x#0};
-//     _pos = _pos vectorMultiply (1 / _count);
-
-//     private _vectorDirAndUp = _objToPlace#1;
-//     for "_i" from 1 to _count do {
-//         private _nextVectorDirAndUp = (_nearby#_i)#1;
-//         private _alpha = 1 / (_i + 1);
-//         _vectorDirAndUp = [
-//             [_vectorDirAndUp#0, _nextVectorDirAndUp#0, _alpha] call BIS_fnc_slerp,
-//             [_vectorDirAndUp#1, _nextVectorDirAndUp#1, _alpha] call BIS_fnc_slerp
-//         ]
-//     };
-//     _toPlaceFinal pushBack [_pos, _vectorDirAndUp]; 
-// };
 {
     _x params ["_posASL", "_vectorDirAndUp"];
     private _trenchPiece = createSimpleObject ["Peer_Trench_Straight_Short_Chameleon", _posASL];
     _trenchPiece setPosASL _posASL;
-    _posASL set [2, true];
+    // _posASL set [2, true];
     _trenchPiece setObjectTextureGlobal [0, (surfaceTexture _posASL)];
     _trenchPiece hideSelection ["snow", true];
     _trenchPiece setVectorDirAndUp _vectorDirAndUp;
