@@ -1,4 +1,10 @@
-params ["_trenchPiece", "_trenchPieces", "_extraComponents"];
+params ["_trenchPiece", "_trenchPieces", "_controller"];
+
+private _wallType = parseNumber (_controller getVariable "WallType"); // Config values are strings
+private _doSandbags = _controller getVariable "DoSandbags";
+private _doBarbedWire = _controller getVariable "DoBarbedWire";
+private _tankTrapType = parseNumber (_controller getVariable "TankTrapType");
+private _extraHorizSegments = _controller getVariable "AdditionalHorizSegments";
 
 // Extra trench pieces to add due to height of trench
 private _wallPieces = [_trenchPiece];
@@ -22,8 +28,6 @@ for "_i" from 1 to _numExtraVertical do {
     _wallPieces pushBack _extraVertical;
     _trenchPieces pushBack _extraVertical;
 };
-
-_extraComponents params ["_wallType", "_doSandbags", "_doBarbedWire", "_tankTrapType", "_additionalHorizontalPieces"];
 if (_wallType isNotEqualTo -1) then {
     private _types = [
         // Concrete
@@ -234,8 +238,8 @@ if (_tankTrapType isNotEqualTo -1) then {
             ]
         ]
     ];
-    private _tankTrapType = _types#_tankTrapType;
-    _tankTrapType apply {
+    private _tankTraps = _types#_tankTrapType;
+    _tankTraps apply {
         _x params ["_type", "_relativePos", "_relativeDirAndUp"];
         private _posASL = _trenchPiece modelToWorldWorld _relativePos;
         private _vectorDirAndUp = _relativeDirAndUp apply {_trenchPiece vectorModelToWorld _x};
@@ -246,8 +250,8 @@ if (_tankTrapType isNotEqualTo -1) then {
         _trenchPieces pushBack _concPiece;
     };
 };
-if (_additionalHorizontalPieces > 0) then {
-    for "_i" from 1 to _additionalHorizontalPieces do {
+if (_extraHorizSegments > 0) then {
+    for "_i" from 1 to _extraHorizSegments do {
         private _relativePos = [0,-8.155,-0.671] vectorMultiply _i;
         private _dirAndUp = [[0,1,0],[0,0,1]] apply {
             _trenchPiece vectorModelToWorld _x

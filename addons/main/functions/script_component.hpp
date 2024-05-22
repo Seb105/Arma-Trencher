@@ -12,3 +12,11 @@
 #endif
 
 #include "\z\trencher\addons\main\script_macros.hpp"
+
+#define SEGMENT_LENGTH 7.5
+#define SEGMENT_LENGTH_HALF (SEGMENT_LENGTH/2)
+#define SEGMENT_WIDTH 9
+#define SEGMENT_WIDTH_HALF (SEGMENT_WIDTH/2)
+#define SEGMENT_SLOPE_TOP 2.7
+#define SEGMENT_SLOPE_BOTTOM 2.2
+#define SEGMENT_FALL (SEGMENT_SLOPE_TOP-SEGMENT_SLOPE_BOTTOM)

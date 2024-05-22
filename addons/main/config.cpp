@@ -30,10 +30,13 @@ class CfgFunctions
             class cleanUpNodes {};
             class connectedTrenchPieces {};
             class getObjsToHide {};
-            class getTerrainModPoints {};
+            class getTerrainPoints {};
+            class getTrenchLines {};
+            class getTrenchObjects {};
             class handleObjectAdditions {};
             class handleObjects {};
             class handleTerrain {};
+            class offset {};
             class onEntityAdded {};
             class onMissionLoad {};
             class registerEntity {};
@@ -198,11 +201,49 @@ class CfgVehicles
         };
     };
 };
-class Cfg3DEN {
-    class EventHandlers {
-        class ADDON {
+class Cfg3DEN 
+{
+    class EventHandlers 
+    {
+        class ADDON 
+        {
             onMissionLoad =  QUOTE([] call FUNC(onMissionLoad));
             onEditableEntityAdded = QUOTE(_this call FUNC(onEntityAdded));
+        };
+    };
+    class Mission 
+    {
+        class ADDON 
+        {
+            class AttributeCategories 
+            {
+                class Data 
+                {
+                    class Attributes 
+                    {
+                        class SimpleObjects 
+                        {
+                            defaultValue = "";
+                            property = QGVAR(SimpleObjects);
+                        };
+                        class SimulatedObjects 
+                        {
+                            defaultValue = "";
+                            property = QGVAR(SimulatedObjects);
+                        };
+                        class TerrainPoints 
+                        {
+                            defaultValue = "";
+                            property = QGVAR(TerrainPoints);
+                        };
+                        class HiddenObjects 
+                        {
+                            defaultValue = "";
+                            property = QGVAR(HiddenObjects);
+                        };
+                    };
+                };
+            };
         };
     };
 };

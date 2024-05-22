@@ -1,19 +1,13 @@
-params ["_origin", "_toPlace", "_interSectionAreas", "_segmentLength", "_hiddenObjects"];
+params ["_controller", "_toPlace", "_toHide"];
 // Hide objects
-_hiddenObjects = _hiddenObjects arrayIntersect _hiddenObjects;
 {
     _x hideObjectGlobal true;
-} forEach _hiddenObjects;
-_origin setVariable ["hiddenObjects", _hiddenObjects];
+} forEach _toHide;
+_controller setVariable ["hiddenObjects", _toHide];
 
 // Place objects
-private _trenchPieces = _origin getVariable "trenchPieces"; // By reference
+private _trenchPieces = _controller getVariable "trenchPieces"; // By reference
 // Remove objects that are intersecting with the trench walkable area
-private _notIntersecting = _toPlace select {
-    private _objPos = (_x#0);
-    _interSectionAreas findIf {_objPos inArea _x} isEqualTo -1
-};
-private _toPlaceFinal = _notIntersecting;
 {
     _x params ["_posASL", "_vectorDirAndUp"];
     private _trenchPiece = createSimpleObject ["Peer_Trench_Straight_Short_Chameleon", _posASL];
@@ -24,5 +18,5 @@ private _toPlaceFinal = _notIntersecting;
     _trenchPiece setVectorDirAndUp _vectorDirAndUp;
     _trenchPiece enableSimulationGlobal false;
     _trenchPieces pushBack _trenchPiece;
-} forEach _toPlaceFinal;
+} forEach _toPlace;
 _trenchPieces

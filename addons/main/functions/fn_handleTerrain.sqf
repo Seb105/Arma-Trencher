@@ -1,5 +1,5 @@
 #include "script_component.hpp"
-params ["_origin", "_nodes", "_terrainPoints", "_widthToEdge", "_blendTrenchEnds"];
+params ["_controller", "_nodes", "_terrainPoints", "_widthToEdge", "_blendTrenchEnds"];
 // Iterate through and remove duplicatge [x,y] points, keeping the lowest z
 private _terrainPointsFiltered = [];
 {
@@ -14,7 +14,7 @@ private _terrainPointsFiltered = [];
         };
     };
 } forEach _terrainPoints;
-_origin setVariable ["points", _terrainPoints];
+_controller setVariable ["points", _terrainPoints];
 
 // Subtract the depth of trench
 private _terrainPointsSub = _terrainPointsFiltered;
