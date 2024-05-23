@@ -1,20 +1,22 @@
 #include "script_component.hpp"
 params ["_controller", "_nodes", "_terrainPoints", "_widthToEdge", "_blendTrenchEnds"];
-// Iterate through and remove duplicatge [x,y] points, keeping the lowest z
+// Iterate through and remove duplicatge [x,y] points, keeping the average Z
 private _terrainPointsFiltered = [];
-{
-    private _point = _x;
-    private _existing = _terrainPointsFiltered findIf {_x#0 isEqualTo _point#0 and _x#1 isEqualTo _point#1};
-    if (_existing isEqualTo -1) then {
-        _terrainPointsFiltered pushBack _point;
-    } else {
-        private _existingZ = (_terrainPointsFiltered#_existing)#2;
-        if (_existingZ > _point#2) then {
-            _terrainPointsFiltered set [_existing, _point];
-        };
+while {count _terrainPoints > 0} do {
+    private _point = _terrainPoints#0;
+    private _matching = _terrainPoints select {_x#0 isEqualTo _point#0 && {_x#1 isEqualTo _point#1}};
+    _terrainPoints = _terrainPoints - _matching;
+    private _matchingCount = count _matching;
+    if (_matchingCount > 1) then {
+        private _matchingZ = 0;
+        {
+            _matchingZ = _x#2 + _matchingZ;
+        } forEach _matching;
+        _matchingZ = _matchingZ / _matchingCount;
+        _point set [2, _matchingZ];
     };
-} forEach _terrainPoints;
-
+    _terrainPointsFiltered pushBack _point;
+};
 // Subtract the depth of trench
 [_terrainPointsFiltered, true, true] call TerrainLib_fnc_setTerrainHeight;
 // Restore end piece to blend transition

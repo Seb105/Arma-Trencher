@@ -18,32 +18,17 @@ class CfgPatches
     };
 };
 
-class CfgFunctions
-{
-    class ADDON
-    {
-        class ADDON
-        {
-            file = QPATHTOF(functions);
-            class allTrenchNetworks {};
-            class buildTrenchSystem {};
-            class cleanUpNodes {};
-            class connectedTrenchPieces {};
-            class getObjsToHide {};
-            class getTerrainPoints {};
-            class getTrenchLines {};
-            class getTrenchObjects {};
-            class handleObjectAdditions {};
-            class handleObjects {};
-            class handleTerrain {};
-            class offset {};
-            class onEntityAdded {};
-            class onMissionLoad {};
-            class registerEntity {};
-            class uniquePairs {};
-        };
-    };
-};
+// class CfgFunctions
+// {
+//     class ADDON
+//     {
+//         class ADDON
+//         {
+//             file = QPATHTOF(functions);
+//             class onMissionLoad {};
+//         };
+//     };
+// };
 
 
 class CfgVehicles
@@ -203,43 +188,49 @@ class CfgVehicles
 };
 class Cfg3DEN 
 {
-    class EventHandlers 
-    {
-        class ADDON 
-        {
-            onMissionLoad =  QUOTE([] call FUNC(onMissionLoad));
-            onEditableEntityAdded = QUOTE(_this call FUNC(onEntityAdded));
-        };
-    };
+    // class EventHandlers 
+    // {
+    //     class ADDON 
+    //     {
+    //         onMissionLoad = QUOTE(call FUNC(onMissionLoad));
+    //         onEditableEntityAdded = QUOTE(_this call FUNC(onEntityAdded));
+    //     };
+    // };
     class Mission 
     {
         class ADDON 
         {
+            displayName = "Trencher";
             class AttributeCategories 
             {
-                class Data 
+                class MissionData 
                 {
                     class Attributes 
                     {
                         class SimpleObjects 
                         {
                             defaultValue = "";
-                            property = QGVAR(SimpleObjects);
+                            property = QGVAR(simpleObjects);
                         };
                         class SimulatedObjects 
                         {
                             defaultValue = "";
-                            property = QGVAR(SimulatedObjects);
+                            property = QGVAR(simulatedObjects);
                         };
-                        class TerrainPoints 
+                        class TrenchPieces 
                         {
                             defaultValue = "";
-                            property = QGVAR(TerrainPoints);
+                            property = QGVAR(trenchPieces);
                         };
                         class HiddenObjects 
                         {
                             defaultValue = "";
-                            property = QGVAR(HiddenObjects);
+                            property = QGVAR(hiddenObjects);
+                        };
+                        class TerrainPoints 
+                        {
+                            defaultValue = "";
+                            property = QGVAR(terrainPoints);
                         };
                     };
                 };

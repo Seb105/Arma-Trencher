@@ -14,3 +14,4 @@ PREP(onEntityAdded);
 PREP(onMissionLoad);
 PREP(registerEntity);
 PREP(uniquePairs);
+PREP(writeToSQM);

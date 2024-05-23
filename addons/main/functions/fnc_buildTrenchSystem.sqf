@@ -15,6 +15,15 @@ if (count _controllers == 0) exitWith {
 };
 private _cellSize = (getTerrainInfo)#2;
 private _controller = _controllers#0;
+
+// systemchat str ["built", time];
+
+// Check if we need to update. As you can modify more than one trench at a time, we need to check if the last frame we updated this trench was the current frame
+// private _frame = diag_frameNo;
+// if (_controller getVariable [QGVAR(lastFrame), -1] == _frame) exitWith {};
+// _controller setVariable [QGVAR(lastFrame), _frame];
+
+
 private _depth = _controller getVariable "TrenchDepth";
 private _trenchWidth = _controller getVariable "TrenchWidth";
 private _pitch = _controller getVariable "TrenchPitch"; // SLope of the trench walls
@@ -32,7 +41,7 @@ private _widthToEdge = _trenchWidth/2 + SEGMENT_WIDTH;
 private _trueDepth = 0 max (_depth - SEGMENT_FALL);
 private _lines = [_nodes, _trenchWidth] call FUNC(getTrenchLines);
 private _toPlace = [_lines, _pitch, _trenchWidth] call FUNC(getTrenchObjects);
-private _toHide = [_pairs, _trenchWidth] call FUNC(getObjsToHide);
+private _toHide = [_pairs, _trenchWidth + SEGMENT_WIDTH] call FUNC(getObjsToHide);
 // Handle terrain
 private _terrainPoints = [_pairs, _widthToEdge, _widthToObj, _cellSize, _trueDepth] call FUNC(getTerrainPoints);
 private _terrainPointsSet = [_controller, _nodes, _terrainPoints, _widthToEdge, _blendTrenchEnds] call trencher_main_fnc_handleTerrain;

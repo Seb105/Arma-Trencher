@@ -1,12 +1,19 @@
 #include "script_component.hpp"
-[] spawn {
-    // retard script wont work right at mission load unless i do this shit
-    waitUntil {time > 1};
-    isNil {
-        private _allTrenchNetworks = call FUNC(allTrenchNetworks);
-        {
-            private _origin = _x#0;
-            [_origin] call FUNC(buildTrenchSystem);
-        } forEach _allTrenchNetworks;
-    };
+private _allTrenchNetworks = call FUNC(allTrenchNetworks);
+{
+    private _origin = _x#0;
+    [_origin] call FUNC(buildTrenchSystem);
+} forEach _allTrenchNetworks;
+
+
+// This function runs every time the mission is loaded, but also every time the scenario preview is exited
+// We need to make sure that we don't register the entities multiple times
+private _allNodes = (all3DENEntities#3) select {_x isKindOf QGVAR(Module_TrenchPiece)};
+_allNodes apply {_x call FUNC(registerEntity)};
+if (missionNameSpace getVariable [QGVAR(EHSADDED), false]) exitWith {
+    // systemchat "Trenches already initialized";
 };
+add3DENEventHandler ["OnEditableEntityAdded", {_this call FUNC(onEntityAdded)}];
+add3DENEventHandler ["OnMissionPreviewEnd", {
+	GVAR(EHSADDED) = true
+}];

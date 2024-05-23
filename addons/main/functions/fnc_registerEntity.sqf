@@ -5,11 +5,12 @@ private _ehs = [
     "ConnectionChanged3DEN",
     "RegisteredToWorld3DEN"
 ];
-_module call FUNC(buildTrenchSystem);
+// _module call FUNC(buildTrenchSystem);
 {
     private _eh = _x;
     _module addEventHandler [_eh, {
         params ["_object"];
+        // systemchat format ["%1: %2", _thisEventHandler, _object];
         _object call FUNC(buildTrenchSystem);
     }];
 } forEach _ehs;
@@ -21,7 +22,7 @@ _module addEventHandler ["UnregisteredFromWorld3DEN", {
     // Find something that is connnected to this node.
     private _connections = get3DENConnections _object;
     if (count _connections == 0) exitWith {};
-    _newObj = _connections#0;
+    _newObj = _connections#1;
     // Next frame, _object is deleted, so we need to update the new object.
     [{
         params ["_newObj"];
