@@ -1,4 +1,4 @@
-params ["_trenchPiece", "_trenchPieces", "_controller"];
+params ["_trenchPiece", "_trenchPieces", "_simulatedObjects", "_simpleObjects", "_controller"];
 
 private _wallType = parseNumber (_controller getVariable "WallType"); // Config values are strings
 private _doSandbags = _controller getVariable "DoSandbags";
@@ -137,7 +137,7 @@ if (_wallType isNotEqualTo -1) then {
             _wallPiece setPosWorld _posASL;
             _wallPiece setVectorDirAndUp _vectorDirAndUp;
             _wallPiece enableSimulationGlobal false;
-            _trenchPieces pushBack _wallPiece;
+            _simpleObjects pushBack _wallPiece;
         };
     };
 };
@@ -146,12 +146,13 @@ if (_doBarbedWire) then {
     private _relativeDirAndUp = [[0,0.994,0.108],[0,-0.108,0.994]];
     private _posASL = _trenchPiece modelToWorldWorld _relativePos;
     private _vectorDirAndUp = _relativeDirAndUp apply {_trenchPiece vectorModelToWorld _x};
-    // This object should be simulated so it can be destroyed
-    private _barbedWire = createVehicle ["Land_Razorwire_F", _posASL];   
+    // This object should be simulated so it can be destroyed.
+    // Don't need to simulate it in eden but add to different array
+    private _barbedWire = createSimpleObject ["Land_Razorwire_F", _posASL];   
     _barbedWire setPosWorld _posASL;
     _barbedWire setVectorDirAndUp _vectorDirAndUp;
     _barbedWire enableDynamicSimulation true;
-    _trenchPieces pushBack _barbedWire;
+    _simulatedObjects pushBack _barbedWire;
 };
 if (_doSandbags) then {
     [
@@ -178,7 +179,7 @@ if (_doSandbags) then {
         _sandbag setPosWorld _posASL;
         _sandbag setVectorDirAndUp _vectorDirAndUp;
         _sandbag enableSimulationGlobal false;
-        _trenchPieces pushBack _sandbag;
+        _simpleObjects pushBack _sandbag;
     };
 };
 if (_tankTrapType isNotEqualTo -1) then {
@@ -247,7 +248,7 @@ if (_tankTrapType isNotEqualTo -1) then {
         _concPiece setPosWorld _posASL;
         _concPiece setVectorDirAndUp _vectorDirAndUp;
         _concPiece enableSimulationGlobal false;
-        _trenchPieces pushBack _concPiece;
+        _simpleObjects pushBack _concPiece;
     };
 };
 if (_extraHorizSegments > 0) then {

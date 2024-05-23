@@ -26,20 +26,30 @@ if (_trenchWidth < _minTrenchWidth) then {
     [_msg, 1, 5, true, 0] call BIS_fnc_3DENNotification;
     _controller setVariable ["TrenchWidth", _trenchWidth];
 };
-// Create new objs+
+// Get new objs to place
 private _widthToObj = (SEGMENT_WIDTH + _trenchWidth)/2;
 private _widthToEdge = _trenchWidth/2 + SEGMENT_WIDTH;
 private _trueDepth = 0 max (_depth - SEGMENT_FALL);
 private _lines = [_nodes, _trenchWidth] call FUNC(getTrenchLines);
-private _toPlace = [_lines, _pitch] call FUNC(getTrenchObjects);
+private _toPlace = [_lines, _pitch, _trenchWidth] call FUNC(getTrenchObjects);
 private _toHide = [_pairs, _trenchWidth] call FUNC(getObjsToHide);
 // Handle terrain
-_terrainPoints = [_pairs, _widthToEdge, _widthToObj, _cellSize, _trueDepth] call FUNC(getTerrainPoints);
-[_controller, _nodes, _terrainPoints, _widthToEdge, _blendTrenchEnds] call trencher_main_fnc_handleTerrain;
+private _terrainPoints = [_pairs, _widthToEdge, _widthToObj, _cellSize, _trueDepth] call FUNC(getTerrainPoints);
+private _terrainPointsSet = [_controller, _nodes, _terrainPoints, _widthToEdge, _blendTrenchEnds] call trencher_main_fnc_handleTerrain;
 
-// systemChat str _toPlace;
+// Create new objs
 private _trenchPieces = [_controller, _toPlace, _toHide] call trencher_main_fnc_handleObjects;
+private _simpleObjects = [];
+private _simulatedObjects = [];
 // Copy arr as to not iterate whilst modifying
 (+_trenchPieces) apply {
-    [_x, _trenchPieces, _controller] call trencher_main_fnc_handleObjectAdditions;
+    [_x, _trenchPieces, _simulatedObjects, _simpleObjects, _controller] call trencher_main_fnc_handleObjectAdditions;
 };	
+
+// Write to SQM
+_controller setVariable [QGVAR(simpleObjects), _simpleObjects];
+_controller setVariable [QGVAR(simulatedObjects), _simulatedObjects];
+_controller setVariable [QGVAR(terrainPoints), _terrainPointsSet];
+_controller setVariable [QGVAR(trenchPieces), _trenchPieces];
+_controller setVariable [QGVAR(hiddenObjects), _toHide];
+call FUNC(writeToSQM);

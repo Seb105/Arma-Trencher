@@ -1,12 +1,12 @@
+#include "script_component.hpp"
 params ["_controller", "_toPlace", "_toHide"];
 // Hide objects
 {
     _x hideObjectGlobal true;
 } forEach _toHide;
-_controller setVariable ["hiddenObjects", _toHide];
 
 // Place objects
-private _trenchPieces = _controller getVariable "trenchPieces"; // By reference
+private _trenchPieces = _controller getVariable QGVAR(trenchPieces); // By reference
 // Remove objects that are intersecting with the trench walkable area
 {
     _x params ["_posASL", "_vectorDirAndUp"];

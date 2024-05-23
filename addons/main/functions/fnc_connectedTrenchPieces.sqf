@@ -15,4 +15,4 @@ while {count _toVisit > 0} do {
     _connectedPieces append _newVisit;
     _toVisit = _newVisit;
 };
-[_connectedPieces, [], {count get3DENConnections _x}, "DESCEND"] call BIS_fnc_sortBy
+_connectedPieces
