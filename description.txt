@@ -1,0 +1,54 @@
+[h1]Trencher[/h1]
+
+Module-based trench generation.
+
+You must save the mission for trench modifications to show up in-game.
+
+The server and client both need this mod and its dependencies for it to work.
+
+[H1]FEATURES:[/H1]
+- Create trenches of any depth and width, with lots of configuration options
+- Optionally add reinforcement to the trench walls, sandbags, dragons teeth and barbed wire
+- Optimised for multiplayer performance
+- Trench ends will smoothly blend with terrain
+- Hides objects in trench path
+
+[h1]Performance[/h1]
+This mod is designed with multiplayer performance in mind:
+- Everything except the barbed wire is a local simple object. This is the most simple type of object you can create in-game, and has zero network traffic.
+- Simple objects also barely impact FPS compared to simulated objects, so you will find this mod performs way better than you'd expect.
+- Data on how to create these objects is contained within the mission file itself, therefore the JIP queue is not spammed, nor is a ton of data transferred after mission start
+- The exception to this is barbed wire, which must be simulated to be destroyable/cuttable. Barbed wire is only created on the server and Dynamic Simulation will be enabled on all barbed wire objects.
+- Terrain modifications are also added to the JIP queue, can't avoid this.
+
+[h1]Compatibility[/h1]
+[b]Deformer[/b]
+Semi-compatible - overlapping trenches and deformer modifications may result in one or both sets of changes getting applied.
+To avoid issues just don't overlap Deformer and Trencher areas.
+[b]Bucket: Zeus Terrain Editor[/b]
+Fully compatible
+[b]AI[/b]
+AI will not cheat and walk through trench walls. They can only enter or exit trenches at actual entrances.
+Unfortunately, AI cannot storm over the top of trenches.
+
+[h1]How to use[/h1]
+- Place a trench controller module in Eden
+- Sync any number trench piece modules to each other and the controller module
+- Modify settings using the module attributes of the controller module
+- Save the mission for changes to take effect.
+
+[h1]Known issues[/h1]
+- Saving the mission is required to show changes in preview.
+- Moving multiple modules at the same time is very laggy as each time you move a single piece it recalculates the entire trench. Each node move will do this. This can crash the editor, sorry!
+- Creates large mission files.
+- Can look kinda jank on maps with very large terrain grids (old maps like Sahrani).
+
+[b]Code & Licensing[/b]
+Please submit bug reports or feature requests to this projects [url=https://github.com/Seb105/Arma-Trencher]GitHub[/url]
+Licensed under GPL v2.0
+
+[h1] Looking for an Arma community? Check CNTO out: [/h1]
+
+https://www.carpenoctem.co/
+
+https://www.youtube.com/watch?v=QE8tMdhDYjI

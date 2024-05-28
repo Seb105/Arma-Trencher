@@ -149,7 +149,7 @@ class CfgVehicles
             class DoBarbedWire 
             {
                 displayName = "Barbed Wire";
-                description = "Add barbed wire to lip of trench";
+                description = "Add barbed wire to lip of trench. WARNING: Barbed wire objects are simulated and therefore can cause performance issues";
                 typeName = "BOOL";
                 defaultValue = "false";
             };
@@ -171,7 +171,7 @@ class CfgVehicles
                     };
                     class DragonTeeth {
                         default = 0;
-                        name = "Dragon Teeth";
+                        name = "Dragon's Teeth";
                         value = 1;
                     };
                 };
