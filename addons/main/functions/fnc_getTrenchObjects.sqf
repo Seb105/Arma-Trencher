@@ -13,9 +13,9 @@ _lines apply {
     private _objCentreEnd = [_trueEnd, _dir+90, SEGMENT_WIDTH_HALF] call FUNC(offset);
     // SWEEPS pushBack [_start, _end];
     // Get 3d distance so we can get extra objects on steeps slopes.
-    private _start3D = _start vectorAdd [0,0,getTerrainHeightASL _start];
-    private _end3D = _end vectorAdd [0,0,getTerrainHeightASL _end];
-    private _distance = _start3D distance _end3D;
+    // private _start3D = _start vectorAdd [0,0,getTerrainHeightASL _start];
+    // private _end3D = _end vectorAdd [0,0,getTerrainHeightASL _end];
+    private _distance = _start distance2d _end;
     // private _isSinglePoint = (_start distance2d _end) < (_trueSegmentLength);
     private _numSegments = (floor (_distance/SEGMENT_LENGTH)) max 1;
     private _segmentOffset = (_objCentreEnd vectorDiff _objCentreStart) vectorMultiply (1/_numSegments);

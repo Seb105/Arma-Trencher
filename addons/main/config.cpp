@@ -222,10 +222,10 @@ class Cfg3DEN
                             defaultValue = "";
                             property = QGVAR(trenchPieces);
                         };
-                        class HiddenObjects 
+                        class HideAreas 
                         {
                             defaultValue = "";
-                            property = QGVAR(hiddenObjects);
+                            property = QGVAR(hideAreas);
                         };
                         class TerrainPoints 
                         {

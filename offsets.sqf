@@ -70,14 +70,17 @@ private _testObjs = missionNamespace getVariable ["testobjs",[]];
 _testObjs apply {deleteVehicle _x};
 _testObjs = [];
 {
-    _x params ["_name", "_offsets"];
+    private _trench = _x;
     {
-        _x params ["_type", "_relPos", "_relVectorDirAndUp"];
-        private _posASL = (trench_2 modelToWorldWorld _relPos);
-        private _vectorDirAndUp = _relVectorDirAndUp apply {trench_2 vectorModelToWorld _x};
-        private _veh = createSimpleObject [_type, _posASL];
-        _veh setPosWorld _posASL;
-        _veh setVectorDirAndUp _vectorDirAndUp;
-        _testObjs pushBack _veh; 
-    } forEach _offsets;
-} forEach _allOffsets;
+        _x params ["_name", "_offsets"];
+        {
+            _x params ["_type", "_relPos", "_relVectorDirAndUp"];
+            private _posASL = (_trench modelToWorldWorld _relPos);
+            private _vectorDirAndUp = _relVectorDirAndUp apply {_trench vectorModelToWorld _x};
+            private _veh = createSimpleObject [_type, _posASL];
+            _veh setPosWorld _posASL;
+            _veh setVectorDirAndUp _vectorDirAndUp;
+            _testObjs pushBack _veh; 
+        } forEach _offsets;
+    } forEach _allOffsets;
+} forEach [trench_2, trench_3, trench_4];

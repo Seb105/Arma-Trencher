@@ -26,6 +26,7 @@ params ["_nodes"];
     [_originalHeights, true, true] call TerrainLib_fnc_setTerrainHeight;
     _node setVariable [QGVAR(terrainPoints), []];
 
+    _node setVariable [QGVAR(hideAreas), []];
 
     {
         _x hideObjectGlobal false;

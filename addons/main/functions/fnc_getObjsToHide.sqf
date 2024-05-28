@@ -1,6 +1,7 @@
 #include "script_component.hpp"
 params ["_pairs", "_trenchWidth"];
 private _toHide = [];
+private _areas = [];
 _pairs apply {
     _x params ["_n1", "_n2"];
     private _n1Pos = getPos _n1;
@@ -19,10 +20,12 @@ _pairs apply {
         _dir,
         true
     ];
-    private _objs = ((nearestTerrainObjects [_mid, [], _radius, false, true]) inAreaArray _area) select {
-        !(isObjectHidden _x)
+    private _objs = ((nearestTerrainObjects [_mid, [], _radius, false, true]) inAreaArray _area);
+    
+    if (count _objs > 0) then {
+        _areas pushBack _area;
+        _toHide append _objs;
     };
-    _toHide append _objs;
 };
 _toHide = _toHide arrayIntersect _toHide;
-_toHide 
+[_areas, _toHide] 

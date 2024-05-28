@@ -41,13 +41,14 @@ private _widthToEdge = _trenchWidth/2 + SEGMENT_WIDTH;
 private _trueDepth = 0 max (_depth - SEGMENT_FALL);
 private _lines = [_nodes, _trenchWidth] call FUNC(getTrenchLines);
 private _toPlace = [_lines, _pitch, _trenchWidth] call FUNC(getTrenchObjects);
-private _toHide = [_pairs, _trenchWidth + SEGMENT_WIDTH] call FUNC(getObjsToHide);
+private _toHideAreasAndObjs = [_pairs, _trenchWidth + SEGMENT_WIDTH] call FUNC(getObjsToHide);
+_toHideAreasAndObjs params ["_toHideAreas", "_toHideObjs"];
 // Handle terrain
 private _terrainPoints = [_pairs, _widthToEdge, _widthToObj, _cellSize, _trueDepth] call FUNC(getTerrainPoints);
 private _terrainPointsSet = [_controller, _nodes, _terrainPoints, _widthToEdge, _blendTrenchEnds] call trencher_main_fnc_handleTerrain;
 
 // Create new objs
-private _trenchPieces = [_controller, _toPlace, _toHide] call trencher_main_fnc_handleObjects;
+private _trenchPieces = [_controller, _toPlace, _toHideObjs] call trencher_main_fnc_handleObjects;
 private _simpleObjects = [];
 private _simulatedObjects = [];
 // Copy arr as to not iterate whilst modifying
@@ -60,5 +61,6 @@ _controller setVariable [QGVAR(simpleObjects), _simpleObjects];
 _controller setVariable [QGVAR(simulatedObjects), _simulatedObjects];
 _controller setVariable [QGVAR(terrainPoints), _terrainPointsSet];
 _controller setVariable [QGVAR(trenchPieces), _trenchPieces];
-_controller setVariable [QGVAR(hiddenObjects), _toHide];
+_controller setVariable [QGVAR(hiddenObjects), _toHideObjs];
+_controller setVariable [QGVAR(hideAreas), _toHideAreas];
 call FUNC(writeToSQM);
