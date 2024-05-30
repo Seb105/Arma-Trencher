@@ -2,6 +2,7 @@
 private _allTrenchNetworks = call FUNC(allTrenchNetworks);
 {
     private _origin = _x#0;
+    // systemChat format ["Building trench system at %1", _origin];
     [_origin] call FUNC(buildTrenchSystem);
 } forEach _allTrenchNetworks;
 

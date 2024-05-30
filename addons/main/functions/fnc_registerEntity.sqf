@@ -10,7 +10,7 @@ private _ehs = [
     private _eh = _x;
     _module addEventHandler [_eh, {
         params ["_object"];
-        // systemchat format ["%1: %2", _thisEventHandler, _object];
+        if (time < 1) exitWith {};
         _object call FUNC(buildTrenchSystem);
     }];
 } forEach _ehs;

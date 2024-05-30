@@ -64,3 +64,4 @@ _controller setVariable [QGVAR(trenchPieces), _trenchPieces];
 _controller setVariable [QGVAR(hiddenObjects), _toHideObjs];
 _controller setVariable [QGVAR(hideAreas), _toHideAreas];
 call FUNC(writeToSQM);
+// systemchat str ["built", _controller];
