@@ -3,7 +3,7 @@ params ["_lines", "_pitch", "_trenchWidth"];
 private _toPlace = [];
 private _distToOtherEdge = _trenchWidth + SEGMENT_WIDTH*1.5;
 _lines apply {
-    _x params ["_start", "_end", "_isSinglePoint"];
+    _x params ["_start", "_end"];
     // if (_isSinglePoint) then {continue};
     private _dir = _start getDir _end;
     private _pieceDir = _dir - 90;
@@ -15,8 +15,8 @@ _lines apply {
     // Get 3d distance so we can get extra objects on steeps slopes.
     // private _start3D = _start vectorAdd [0,0,getTerrainHeightASL _start];
     // private _end3D = _end vectorAdd [0,0,getTerrainHeightASL _end];
-    private _distance = _start distance2d _end;
-    // private _isSinglePoint = (_start distance2d _end) < (_trueSegmentLength);
+    private _distance = _start distance _end;
+    private _isSinglePoint = _distance < 8;
     private _numSegments = (floor (_distance/SEGMENT_LENGTH)) max 1;
     private _segmentOffset = (_objCentreEnd vectorDiff _objCentreStart) vectorMultiply (1/_numSegments);
     private _halfSegmentOffset = _segmentOffset vectorMultiply 0.5;
@@ -46,7 +46,7 @@ _lines apply {
         private _nextHeight = (getTerrainHeightASL _segmentFrontEnd) min (getTerrainHeightASL _segmentBackEnd);
         // private _start3d = _segmentStartPos vectorAdd [0,0,_currentHeight];
         // private _end3d = _segmentEndPos vectorAdd [0,0,_nextHeight];
-        private _dist = _segmentStartPos distance2d _segmentEndPos;
+        private _dist = _segmentStartPos distance _segmentEndPos;
         private _fall = _nextHeight - _currentHeight;
         private _pieceRoll = -asin (_fall / _dist min 1 max -1); // Errors if fall is too steep
         private _posASL = _objCentre;
