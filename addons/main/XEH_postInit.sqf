@@ -44,5 +44,6 @@ private _trenchPieces = getMissionConfigValue QGVAR(trenchPieces);
 _trenchPieces apply {
     private _obj = _x call _fnc_createSimpleObject;
     _obj setObjectTexture [0, (surfaceTexture (getPos _obj))];
+    _obj setObjectMaterial [0, SEGMENT_MATERIAL];
     _obj hideSelection ["snow", true];
 };

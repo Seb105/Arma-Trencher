@@ -14,6 +14,7 @@ private _trenchPieces = _controller getVariable QGVAR(trenchPieces); // By refer
     _trenchPiece setPosASL _posASL;
     // _posASL set [2, true];
     _trenchPiece setObjectTextureGlobal [0, (surfaceTexture _posASL)];
+    _trenchPiece setObjectMaterialGlobal [0, SEGMENT_MATERIAL];
     _trenchPiece hideSelection ["snow", true];
     _trenchPiece setVectorDirAndUp _vectorDirAndUp;
     _trenchPiece enableSimulationGlobal false;

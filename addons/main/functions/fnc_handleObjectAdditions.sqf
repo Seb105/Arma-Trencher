@@ -33,6 +33,7 @@ for "_i" from 1 to _numExtraVertical do {
     _extraVertical setVectorDirAndUp _dirAndUp;
     _extraVertical enableSimulationGlobal false;
     _extraVertical setObjectTextureGlobal [0, (surfaceTexture _posASL)];
+    _extraVertical setObjectMaterialGlobal [0, SEGMENT_MATERIAL];
     _extraVertical hideSelection ["snow", true];
     _wallPieces pushBack _extraVertical;
     _trenchPieces pushBack _extraVertical;

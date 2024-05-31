@@ -15,5 +15,6 @@
 #define SEGMENT_SLOPE_TOP 2.7
 #define SEGMENT_SLOPE_BOTTOM 2.2
 #define SEGMENT_FALL (SEGMENT_SLOPE_TOP-SEGMENT_SLOPE_BOTTOM)
+#define SEGMENT_MATERIAL "\A3\Structures_F_Enoch\Military\Training\Data\ShellCrater_02_decal_F.rvmat"
 
-#define DISABLE_COMPILE_CACHE
+// #define DISABLE_COMPILE_CACHE
