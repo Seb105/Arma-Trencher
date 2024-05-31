@@ -12,13 +12,15 @@ private _topSegmentHeight = (getPosASL _trenchPiece)#2 - 1.85;
 private _behindTrench = _trenchPiece modelToWorld [0,5,0];
 private _bottomHeight = getTerrainHeightASL _behindTrench;
 private _height = _topSegmentHeight - _bottomHeight;
+private _piecePos = getPosASL _trenchPiece;
 private _numExtraVertical = (ceil (_height / 4.457)) max 0;
 for "_i" from 1 to _numExtraVertical do {
     private _relativePos = [0,0.368,-4.457] vectorMultiply _i;
     private _dirAndUp = [[0,1,0],[0,0,1]] apply {
         _trenchPiece vectorModelToWorld _x
     };
-    private _posASL = _trenchPiece modelToWorldWorld _relativePos;
+    private _posZ = (_trenchPiece modelToWorldWorld _relativePos)#2;
+    private _posASL = [_piecePos#0, _piecePos#1, _posZ];
     private _extraVertical = createSimpleObject ["Peer_Trench_Straight_Short_Chameleon", [0,0,0]];
     _extraVertical setPosWorld _posASL;
     _extraVertical setVectorDirAndUp _dirAndUp;

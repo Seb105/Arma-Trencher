@@ -7,17 +7,21 @@ private _terrainPoints = [];
     private _endNodePos = getPosASL _endNode;
     _startNodePos set [2, 0];
     _endNodePos set [2, 0];
-    private _distance = _startNodePos distance2D _endNodePos;
-    private _dir = _startNodePos getDir _endNodePos;
+    private _vectorDir = _startNodePos vectorFromTo _endNodePos;
+    private _start = _startNodePos vectorAdd (_vectorDir vectorMultiply SEGMENT_LENGTH_HALF);
+    private _end = _endNodePos vectorAdd (_vectorDir vectorMultiply -SEGMENT_LENGTH_HALF);
+    private _distance = _start distance2D _end;
+    private _dir = _start getDir _end;
     private _offsetToBack = [[0,0,0], _dir-90, _widthToEdge] call FUNC(offset);
     private _offsetToFront = [[0,0,0], _dir+90, _widthToEdge] call FUNC(offset);
-    private _numSteps = ceil (_distance/SEGMENT_LENGTH);
+    private _numSteps = (floor (_distance/SEGMENT_LENGTH))+1;
     private _step = (_endNodePos vectorDiff _startNodePos) vectorMultiply (1/_numSteps);
     private _halfStep = _step vectorMultiply 0.5;
-    private _start = _startNodePos vectorAdd (_step vectorMultiply 0.5);
+    private _inverseHalfStep = _halfStep vectorMultiply -1;
+    // private _start = _startNodePos vectorAdd (_step vectorMultiply 0.5);
     for "_i" from (0) to (_numSteps-1) do {
         private _segmentCentre = _start vectorAdd (_step vectorMultiply _i);
-        private _segmentStart = _segmentCentre vectorAdd (_halfStep vectorMultiply -1);
+        private _segmentStart = _segmentCentre vectorAdd _inverseHalfStep;
         private _segmentEnd = _segmentCentre vectorAdd _halfStep;
         private _currentHeight = selectMin ([_offsetToBack, _offsetToFront] apply {
             // POINTS pushBack (_segmentStart vectorAdd _x);

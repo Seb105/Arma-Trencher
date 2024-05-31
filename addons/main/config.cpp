@@ -183,6 +183,27 @@ class CfgVehicles
                 typeName = "NUMBER";
                 defaultValue = "0";
             };
+            class SkipTerrain
+            {
+                displayName = "Skip Terrain";
+                description = "Skip generating terrain modifications for the trench.";
+                typeName = "BOOL";
+                defaultValue = "false";
+            };
+            class SkipObjects
+            {
+                displayName = "Skip Objects";
+                description = "Skip adding objects to the trench.";
+                typeName = "BOOL";
+                defaultValue = "false";
+            };
+            class SkipHidingObjects
+            {
+                displayName = "Skip Hiding Objects";
+                description = "Skip hiding terrain objects in the trench area.";
+                typeName = "BOOL";
+                defaultValue = "false";
+            };
         };
     };
 };

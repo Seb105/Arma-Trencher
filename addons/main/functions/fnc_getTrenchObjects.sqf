@@ -20,6 +20,7 @@ _lines apply {
     private _numSegments = (floor (_distance/SEGMENT_LENGTH)) max 1;
     private _segmentOffset = (_objCentreEnd vectorDiff _objCentreStart) vectorMultiply (1/_numSegments);
     private _halfSegmentOffset = _segmentOffset vectorMultiply 0.5;
+    private _inverseHalfSegmentOffset = _halfSegmentOffset vectorMultiply -1;
 
     // Offsets to the back and front of the trench. This ensures that both sides
     // of the trench are considered when calculating the height of the trench, and
@@ -35,7 +36,7 @@ _lines apply {
     };
     for "_i" from (0) to (_numSegments) do {
         private _objCentre = _objCentreStart vectorAdd (_segmentOffset vectorMultiply _i);
-        private _segmentStartPos = _objCentre vectorAdd (_halfSegmentOffset vectorMultiply -1);
+        private _segmentStartPos = _objCentre vectorAdd _inverseHalfSegmentOffset;
         private _segmentEndPos = _objCentre vectorAdd _halfSegmentOffset;
         private _segmentFrontStart = _segmentStartPos vectorAdd _offsetToFront;
         private _segmentFrontEnd = _segmentEndPos vectorAdd _offsetToFront;
