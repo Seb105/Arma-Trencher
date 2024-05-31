@@ -20,7 +20,7 @@ while {count _terrainPoints > 0} do {
 // Subtract the depth of trench
 [_terrainPointsFiltered, true, true] call TerrainLib_fnc_setTerrainHeight;
 // Restore end piece to blend transition
-if (_blendTrenchEnds) exitWith {
+if (_blendTrenchEnds) then {
     private _restoredPoints = [];
     private _endPieces = _nodes select {count get3DENConnections _x <= 1};
     {
