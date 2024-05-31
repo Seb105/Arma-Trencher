@@ -1,3 +1,4 @@
+#include "script_component.hpp"
 params ["_trenchPiece", "_trenchPieces", "_simulatedObjects", "_simpleObjects", "_controller"];
 
 private _wallType = parseNumber (_controller getVariable "WallType"); // Config values are strings
@@ -10,6 +11,8 @@ private _extraHorizSegments = _controller getVariable "AdditionalHorizSegments";
 private _wallPieces = [_trenchPiece];
 private _topSegmentHeight = (getPosASL _trenchPiece)#2 - 1.85;
 private _behindTrench = _trenchPiece modelToWorld [0,5,0];
+private _pieceDir = getDir _trenchPiece;
+private _offsetStep = [[0,0,0], _pieceDir, 0.368] call FUNC(offset);
 private _bottomHeight = getTerrainHeightASL _behindTrench;
 private _height = _topSegmentHeight - _bottomHeight;
 private _piecePos = getPosASL _trenchPiece;
@@ -20,7 +23,8 @@ for "_i" from 1 to _numExtraVertical do {
         _trenchPiece vectorModelToWorld _x
     };
     private _posZ = (_trenchPiece modelToWorldWorld _relativePos)#2;
-    private _posASL = [_piecePos#0, _piecePos#1, _posZ];
+    private _posASL = _piecePos vectorAdd (_offsetStep vectorMultiply _i);
+    _posASL set [2, _posZ];
     private _extraVertical = createSimpleObject ["Peer_Trench_Straight_Short_Chameleon", [0,0,0]];
     _extraVertical setPosWorld _posASL;
     _extraVertical setVectorDirAndUp _dirAndUp;
