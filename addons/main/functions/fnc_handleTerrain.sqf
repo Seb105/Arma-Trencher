@@ -44,6 +44,8 @@ if (_blendTrenchEnds) then {
             if (_index isEqualTo -1) then {
                 continue;
             };
+            // This extracts the length along the trench of the point, ignoring the width component
+            // Then it uses this as a weight to blend between the current and next height.
             private _newPoint = _terrainPointsFiltered#_index;
             private _newZ = _newPoint#2;
             private _currentZ = _point#2;

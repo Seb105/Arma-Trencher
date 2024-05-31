@@ -12,6 +12,7 @@ private _wallPieces = [_trenchPiece];
 private _topSegmentHeight = (getPosASL _trenchPiece)#2 - 1.85;
 private _behindTrench = _trenchPiece modelToWorld [0,5,0];
 private _pieceDir = getDir _trenchPiece;
+// Only offset backwards to object, ignore lateral movement
 private _offsetStep = [[0,0,0], _pieceDir, 0.368] call FUNC(offset);
 private _bottomHeight = getTerrainHeightASL _behindTrench;
 private _height = _topSegmentHeight - _bottomHeight;
@@ -22,7 +23,9 @@ for "_i" from 1 to _numExtraVertical do {
     private _dirAndUp = [[0,1,0],[0,0,1]] apply {
         _trenchPiece vectorModelToWorld _x
     };
+    // Only care about Z
     private _posZ = (_trenchPiece modelToWorldWorld _relativePos)#2;
+    // Use simple backwards offset. This means that the piece will be directly below and behind the previous piece to match its angle
     private _posASL = _piecePos vectorAdd (_offsetStep vectorMultiply _i);
     _posASL set [2, _posZ];
     private _extraVertical = createSimpleObject ["Peer_Trench_Straight_Short_Chameleon", [0,0,0]];
