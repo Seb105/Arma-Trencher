@@ -143,8 +143,24 @@ class CfgVehicles
             {
                 displayName = "Sandbags";
                 description = "Add sandbags to lip of trench";
-                typeName = "BOOL";
-                defaultValue = "false";
+                class Values {
+                    // Note: values are parsed as strings in game
+                    class None {
+                        default = 1;
+                        name = "None";
+                        value = -1;
+                    };
+                    class Tan {
+                        default = 0;
+                        name = "Tan";
+                        value = 0;
+                    };
+                    class Green {
+                        default = 0;
+                        name = "Green";
+                        value = 1;
+                    };
+                };
             };
             class DoBarbedWire 
             {

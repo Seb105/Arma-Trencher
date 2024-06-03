@@ -2,7 +2,7 @@
 params ["_trenchPiece", "_trenchPieces", "_simulatedObjects", "_simpleObjects", "_controller"];
 private _pieceType = typeOf _trenchPiece;
 private _wallType = parseNumber (_controller getVariable "WallType"); // Config values are strings
-private _doSandbags = _controller getVariable "DoSandbags";
+private _sandBagType = parseNumber (_controller getVariable "DoSandbags");
 private _doBarbedWire = _controller getVariable "DoBarbedWire";
 private _tankTrapType = parseNumber (_controller getVariable "TankTrapType");
 private _extraHorizSegments = _controller getVariable "AdditionalHorizSegments";
@@ -164,7 +164,8 @@ if (_doBarbedWire) then {
     _barbedWire enableDynamicSimulation true;
     _simulatedObjects pushBack _barbedWire;
 };
-if (_doSandbags) then {
+if (_sandBagType isNotEqualTo -1) then {
+    private _sandbagType = ["Land_BagFence_Long_F", "Land_BagFence_01_long_green_F"]#_sandBagType;
     [
         [
             "Land_BagFence_Long_F",
@@ -182,10 +183,10 @@ if (_doSandbags) then {
             [[0,1,0],[-0.148,0,0.989]]
         ]
     ] apply {
-        _x params ["_type", "_relativePos", "_relativeDirAndUp"];
+        _x params ["_", "_relativePos", "_relativeDirAndUp"];
         private _posASL = _trenchPiece modelToWorldWorld _relativePos;
         private _vectorDirAndUp = _relativeDirAndUp apply {_trenchPiece vectorModelToWorld _x};
-        private _sandbag = createSimpleObject ["Land_BagFence_Long_F", _posASL];
+        private _sandbag = createSimpleObject [_sandbagType, _posASL];
         _sandbag setPosWorld _posASL;
         _sandbag setVectorDirAndUp _vectorDirAndUp;
         _sandbag enableSimulationGlobal false;
