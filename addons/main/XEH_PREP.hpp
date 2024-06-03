@@ -4,6 +4,7 @@ PREP(cleanUpNodes);
 PREP(connectedTrenchPieces);
 PREP(getObjsToHide);
 PREP(getTerrainPoints);
+PREP(getTrenchCorners);
 PREP(getTrenchLines);
 PREP(getTrenchObjects);
 PREP(handleObjectAdditions);

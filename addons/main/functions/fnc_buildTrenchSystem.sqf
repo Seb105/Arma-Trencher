@@ -46,26 +46,30 @@ if (_trenchWidth < _minTrenchWidth) then {
 private _widthToObj = (SEGMENT_WIDTH + _trenchWidth)/2;
 private _widthToEdge = _trenchWidth/2 + SEGMENT_WIDTH;
 private _trueDepth = 0 max (_depth - SEGMENT_FALL);
-private _toPlace = if (_skipObjects) then {
-    []
-} else {
-    private _lines = [_nodes, _trenchWidth] call FUNC(getTrenchLines);
-    [_lines, _pitch, _trenchWidth] call FUNC(getTrenchObjects)
+private _lines = [];
+private _toPlace = [];
+if !(_skipObjects) then {
+    _lines = [_nodes, _trenchWidth] call FUNC(getTrenchLines);
+    _toPlace = [_lines, _pitch, _trenchWidth] call FUNC(getTrenchObjects)
 };
 // Get objs to hide
-private _toHideAreasAndObjs = if (_skipHidingObjects) then {
-    [[], []]
-} else {
-    [_pairs, _trenchWidth + SEGMENT_WIDTH] call FUNC(getObjsToHide)
+private _toHideAreasAndObjs = [[], []];
+if !(_skipHidingObjects) then {
+    _toHideAreasAndObjs = [_pairs, _trenchWidth + SEGMENT_WIDTH] call FUNC(getObjsToHide)
 };
 _toHideAreasAndObjs params ["_toHideAreas", "_toHideObjs"];
 
 // Handle terrain
-private _terrainPointsSet = if (_skipTerrain) then {
-    []
-} else {
+private _terrainPointsSet = []; 
+if !(_skipTerrain) then {
     private _terrainPoints = [_pairs, _widthToEdge, _widthToObj, _cellSize, _trueDepth] call FUNC(getTerrainPoints);
-    [_controller, _nodes, _terrainPoints, _widthToEdge, _blendTrenchEnds, _trueDepth, _cellSize] call trencher_main_fnc_handleTerrain
+    _terrainPointsSet = [_controller, _nodes, _terrainPoints, _widthToEdge, _blendTrenchEnds, _trueDepth, _cellSize] call trencher_main_fnc_handleTerrain
+};
+
+// Do corners after terrain is handled
+if !(_skipObjects) then {
+    private _corners = [_lines, _pitch, _trueDepth - SEGMENT_SLOPE_BOTTOM] call FUNC(getTrenchCorners);
+    _toPlace append _corners;
 };
 
 // Create new objs

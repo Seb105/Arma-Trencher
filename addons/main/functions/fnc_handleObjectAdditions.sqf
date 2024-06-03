@@ -1,6 +1,6 @@
 #include "script_component.hpp"
 params ["_trenchPiece", "_trenchPieces", "_simulatedObjects", "_simpleObjects", "_controller"];
-
+private _pieceType = typeOf _trenchPiece;
 private _wallType = parseNumber (_controller getVariable "WallType"); // Config values are strings
 private _doSandbags = _controller getVariable "DoSandbags";
 private _doBarbedWire = _controller getVariable "DoBarbedWire";
@@ -28,7 +28,7 @@ for "_i" from 1 to _numExtraVertical do {
     // Use simple backwards offset. This means that the piece will be directly below and behind the previous piece to match its angle
     private _posASL = _piecePos vectorAdd (_offsetStep vectorMultiply _i);
     _posASL set [2, _posZ];
-    private _extraVertical = createSimpleObject ["Peer_Trench_Straight_Short_Chameleon", [0,0,0]];
+    private _extraVertical = createSimpleObject [_pieceType, [0,0,0]];
     _extraVertical setPosWorld _posASL;
     _extraVertical setVectorDirAndUp _dirAndUp;
     _extraVertical enableSimulationGlobal false;
@@ -268,7 +268,7 @@ if (_extraHorizSegments > 0) then {
             _trenchPiece vectorModelToWorld _x
         };
         private _posASL = _trenchPiece modelToWorldWorld _relativePos;
-        private _extraHorizontal = createSimpleObject ["Peer_Trench_Straight_Short_Chameleon", [0,0,0]];
+        private _extraHorizontal = createSimpleObject [_pieceType, [0,0,0]];
         _extraHorizontal setPosWorld _posASL;
         _extraHorizontal setVectorDirAndUp _dirAndUp;
         _extraHorizontal enableSimulationGlobal false;

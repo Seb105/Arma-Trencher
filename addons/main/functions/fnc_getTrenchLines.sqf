@@ -1,6 +1,7 @@
 #include "script_component.hpp"
 params ["_nodes", "_trenchWidth"];
 private _lines = [];
+private _ends  = [];
 _nodes apply {
     private _node = _x;
     private _nodePos = getPosASL _node;
@@ -70,7 +71,7 @@ _nodes apply {
         };
         _distances params ["_d1", "_d2"];
         // Intersection has overlapped
-        if (_d1 min _d2 < 0) then {-
+        if (_d1 min _d2 < 0) then {
             continue;
         };
         private _o1 = [_start, _a1 + 90, _trenchWidth/2] call FUNC(offset);
@@ -78,9 +79,9 @@ _nodes apply {
         private _o2 = [_o1, _a1, _d1] call FUNC(offset);
         private _o3 = [_o4, _a2+180, _d2] call FUNC(offset);
         // Append lines to be drawn
-        _lines pushBack [_o1, _o2, false];
-        _lines pushBack [_o2, _o3, true];
-        _lines pushBack [_o3, _o4, false];
+        _lines pushBack [_o1, _o2];
+        _ends pushBack [_o2, _o3, _relAngle];
+        _lines pushBack [_o3, _o4];
     } forEach _connections;
 };
-_lines
+[_lines, _ends]

@@ -1,5 +1,6 @@
 #include "script_component.hpp"
-params ["_lines", "_pitch", "_trenchWidth"];
+params ["_allLines", "_pitch", "_trenchWidth"];
+_allLines params ["_lines", "_ends"];
 private _toPlace = [];
 private _distToOtherEdge = _trenchWidth + SEGMENT_WIDTH*1.5;
 _lines apply {
@@ -16,7 +17,7 @@ _lines apply {
     // private _start3D = _start vectorAdd [0,0,getTerrainHeightASL _start];
     // private _end3D = _end vectorAdd [0,0,getTerrainHeightASL _end];
     private _distance = _start distance _end;
-    private _isSinglePoint = _distance < 8;
+    private _isSinglePoint = _distance < SEGMENT_LENGTH;
     private _numSegments = (floor (_distance/SEGMENT_LENGTH)) max 1;
     private _segmentOffset = (_objCentreEnd vectorDiff _objCentreStart) vectorMultiply (1/_numSegments);
     private _halfSegmentOffset = _segmentOffset vectorMultiply 0.5;
