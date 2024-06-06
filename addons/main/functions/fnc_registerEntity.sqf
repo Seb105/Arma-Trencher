@@ -11,6 +11,7 @@ private _ehs = [
     _module addEventHandler [_eh, {
         params ["_object"];
         if (time < 1) exitWith {};
+        // systemchat str [_object, _thisEvent];
         _object call FUNC(buildTrenchSystem);
     }];
 } forEach _ehs;
