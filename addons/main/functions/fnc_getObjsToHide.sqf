@@ -1,9 +1,10 @@
 #include "script_component.hpp"
 params ["_pairs", "_trenchWidth"];
-private _toHide = [];
-private _areas = [];
+
 _pairs apply {
     _x params ["_n1", "_n2"];
+    private _toHide = [];
+    private _areas = [];
     private _n1Pos = getPos _n1;
     private _n2Pos = getPos _n2;
     [_n1Pos, _n2Pos] apply {
@@ -26,6 +27,7 @@ _pairs apply {
         _areas pushBack _area;
         _toHide append _objs;
     };
+    _toHide = _toHide arrayIntersect _toHide;
+    _n1 setVariable [QGVAR(toHideObjs), _toHide];
+    _n1 setVariable [QGVAR(toHideArea), _area];
 };
-_toHide = _toHide arrayIntersect _toHide;
-[_areas, _toHide] 

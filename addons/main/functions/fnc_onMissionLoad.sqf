@@ -11,10 +11,13 @@ private _allTrenchNetworks = call FUNC(allTrenchNetworks);
 // We need to make sure that we don't register the entities multiple times
 private _allNodes = (all3DENEntities#3) select {_x isKindOf QGVAR(Module_TrenchPiece)};
 _allNodes apply {_x call FUNC(registerEntity)};
-if (missionNameSpace getVariable [QGVAR(EHSADDED), false]) exitWith {
+[QGVAR(Module_TrenchPiece), "init", {_this call FUNC(registerEntity)}, true, []] call CBA_fnc_addClassEventHandler;
+
+
+// if (missionNameSpace getVariable [QGVAR(EHSADDED), false]) exitWith {
     // systemchat "Trenches already initialized";
-};
-add3DENEventHandler ["OnEditableEntityAdded", {_this call FUNC(onEntityAdded)}];
-add3DENEventHandler ["OnMissionPreviewEnd", {
-	GVAR(EHSADDED) = true
-}];
+// };
+// add3DENEventHandler ["OnEditableEntityAdded", {_this call FUNC(onEntityAdded)}];
+// add3DENEventHandler ["OnMissionPreviewEnd", {
+// 	GVAR(EHSADDED) = true
+// }];

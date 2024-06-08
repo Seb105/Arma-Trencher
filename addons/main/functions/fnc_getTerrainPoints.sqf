@@ -1,8 +1,8 @@
 #include "script_component.hpp"
 params ["_pairs", "_widthToEdge", "_widthToObj", "_cellSize", "_trueDepth"];
-private _terrainPoints = [];
 {
     _x params ["_startNode", "_endNode"];
+    private _terrainPoints = _startNode getVariable [QGVAR(terrainPoints), []];
     private _startNodePos = getPosASL _startNode;
     private _endNodePos = getPosASL _endNode;
     _startNodePos set [2, 0];
@@ -48,5 +48,5 @@ private _terrainPoints = [];
         };
         _terrainPoints append _newPoints;
     };
+    _startNode setVariable [QGVAR(terrainPoints), _terrainPoints];
 } forEach _pairs;
-_terrainPoints

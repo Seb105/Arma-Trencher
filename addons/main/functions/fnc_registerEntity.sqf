@@ -12,6 +12,14 @@ private _ehs = [
         params ["_object"];
         if (time < 1) exitWith {};
         _object call FUNC(buildTrenchSystem);
+        // systemChat str [get3DENEntityID _object, _thisEvent];
+        // [_object, diag_frameNo] spawn {
+        //     params ["_object", "_frameNo"];
+        //     waitUntil {diag_frameNo > _frameNo};
+        //     isNil {
+        //         _object call FUNC(buildTrenchSystem);
+        //     };
+        // };
     }];
 } forEach _ehs;
 // Object is deleted AFTER this eh fires.
@@ -19,13 +27,11 @@ _module addEventHandler ["UnregisteredFromWorld3DEN", {
     params ["_object"];
     // Delete anything assosciated with this node.
     [[_object]] call FUNC(cleanUpNodes);
-    // Find something that is connnected to this node.
-    private _connections = get3DENConnections _object;
-    if (count _connections == 0) exitWith {};
-    _newObj = _connections#1;
-    // Next frame, _object is deleted, so we need to update the new object.
-    [{
-        params ["_newObj"];
-        _newObj call FUNC(buildTrenchSystem);
-    },[_newObj]] call CBA_fnc_execNextFrame
+    // Connections are deleted before this EH fires, so get cached.
+    private _connections = _object getVariable [QGVAR(connections), []];
+    [_connections, diag_frameNo] spawn {
+        params ["_connections", "_frameNo"];
+        waitUntil {diag_frameNo > _frameNo};
+        _connections apply {_x call FUNC(buildTrenchSystem)};
+    };
 }];
