@@ -19,7 +19,7 @@ _nodes apply {
         // Get 3d distance so we can get extra objects on steeps slopes.
         // private _start3D = _start vectorAdd [0,0,getTerrainHeightASL _start];
         // private _end3D = _end vectorAdd [0,0,getTerrainHeightASL _end];
-        private _distance = _start distance _end;
+        private _distance = _start vectorDistance _end;
         private _isSinglePoint = _distance < SEGMENT_LENGTH;
         private _numSegments = (floor (_distance/SEGMENT_LENGTH)) max 1;
         private _segmentOffset = (_objCentreEnd vectorDiff _objCentreStart) vectorMultiply (1/_numSegments);

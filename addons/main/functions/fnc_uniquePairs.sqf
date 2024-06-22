@@ -5,7 +5,7 @@ private _pairs = [];
 private _nodes = [_origin] call FUNC(connectedTrenchPieces);
 {
     private _node = _x;
-    private _connections = get3DENConnections _node apply {_x#1};
+    private _connections = _node getVariable QGVAR(connections);
     {
         private _connection = _x;
         private _pair = [[_node, _connection],[],{str _x}] call BIS_fnc_sortBy; // Can't sort objects so cast to str

@@ -12,7 +12,7 @@ private _ehs = [
         params ["_object"];
         if (time < 1) exitWith {};
         _object call FUNC(buildTrenchSystem);
-        // systemChat str [get3DENEntityID _object, _thisEvent];
+        systemChat str [get3DENEntityID _object, _thisEvent];
         // [_object, diag_frameNo] spawn {
         //     params ["_object", "_frameNo"];
         //     waitUntil {diag_frameNo > _frameNo};
@@ -35,3 +35,12 @@ _module addEventHandler ["UnregisteredFromWorld3DEN", {
         _connections apply {_x call FUNC(buildTrenchSystem)};
     };
 }];
+
+// if !(isNil QGVAR(lastPlaced)) then {
+//     private _lastPlaced = GVAR(lastPlaced);
+//     // Sync if you can see the last placed object
+//     if (worldToScreen (getPos _lastPlaced) isNotEqualTo []) then {
+//         add3DENConnection ["Sync", [_lastPlaced], _module];// Set random start on marker "marker_0" for all selected o
+//     }
+// };
+// GVAR(lastPlaced) = _module;

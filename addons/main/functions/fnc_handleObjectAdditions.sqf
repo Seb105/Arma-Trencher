@@ -5,14 +5,15 @@ private _sandBagType = parseNumber (_controller getVariable "DoSandbags");
 private _doBarbedWire = _controller getVariable "DoBarbedWire";
 private _tankTrapType = parseNumber (_controller getVariable "TankTrapType");
 private _extraHorizSegments = _controller getVariable "AdditionalHorizSegments";
+private _aiBuildingPositions = parseNumber (_controller getVariable "AiBuildingPosition");
 
 _nodes apply {
     private _node = _x;
-    private _simulatedObjects = [];
-    private _simpleObjects = [];
+    private _simulatedObjects = _node getVariable QGVAR(simulatedObjects);
+    private _simpleObjects = _node getVariable QGVAR(simpleObjects);
     private _trenchPieces = _node getVariable QGVAR(trenchPieces);
 
-    _trenchPieces apply {
+    (+_trenchPieces) apply {
         private _trenchPiece = _x;
         private _pieceType = typeOf _trenchPiece;
         // Extra trench pieces to add due to height of trench
@@ -288,4 +289,6 @@ _nodes apply {
             };
         };
     };
+
+    private _connections = _node getVariable QGVAR(connections);
 };

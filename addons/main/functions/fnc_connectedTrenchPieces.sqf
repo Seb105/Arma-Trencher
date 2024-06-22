@@ -7,7 +7,7 @@ while {count _toVisit > 0} do {
     private _newVisit = [];
     {
         private _node = _x;
-        private _connections = (get3DENConnections _node) apply {_x#1}; 
+        private _connections = ((get3DENConnections _node) apply {_x#1}) select {_x isKindOf QGVAR(Module_TrenchPiece)};
         _node setVariable [QGVAR(connections), _connections];
         _newVisit append _connections;
     } forEach _toVisit;

@@ -17,13 +17,19 @@ if (count _allNodes < 2) exitWith {
 };
 private _cellSize = (getTerrainInfo)#2;
 private _controller = _controllers#0;
+
+// Check if we need to update. As you can modify more than one trench at a time, we need to check if the last frame we updated this trench was the current frame
+// private _frame = diag_frameNo;
+// if (_controller getVariable [QGVAR(lastFrame), -1] == _frame) exitWith {};
+// _controller setVariable [QGVAR(lastFrame), _frame];
+if (_controller getVariable [QGVAR(locked), false]) exitWith {};
+_controller setVariable [QGVAR(locked), true];
+
 private _controllerSettings = [_controller] call FUNC(nodeSettingsGet);
 private _nodes = _allNodes;
 private _pairs = _allPairs;
 if (_thisSegmentOnly) then {
-    private _connections = ((get3DENConnections _origin) apply {_x#1}) select {
-        _x isKindOf QGVAR(Module_TrenchPiece)
-    };
+    private _connections = _origin getVariable QGVAR(connections);
     _nodes = _allNodes select {
         private _settings = [_x] call FUNC(nodeSettingsGet);
         // copyToClipboard str [get3DENEntityID _x, _settings, _controllerSettings];
@@ -40,13 +46,6 @@ _nodes apply {
     // systemChat str _controllerSettings;
     [_x, _controllerSettings] call FUNC(nodeSettingsSet);
 };
-
-// systemchat str ["built", time];
-
-// Check if we need to update. As you can modify more than one trench at a time, we need to check if the last frame we updated this trench was the current frame
-// private _frame = diag_frameNo;
-// if (_controller getVariable [QGVAR(lastFrame), -1] == _frame) exitWith {};
-// _controller setVariable [QGVAR(lastFrame), _frame];
 
 
 private _depth = _controller getVariable "TrenchDepth";
@@ -82,14 +81,24 @@ if !(_skipHidingObjects) then {
 
 // Handle terrain
 if !(_skipTerrain) then {
+    // private _t1 = diag_tickTime;
     [_pairs, _widthToEdge, _widthToObj, _cellSize, _trueDepth] call FUNC(getTerrainPoints);
+    // private _t2 = diag_tickTime;
+    // private _time = _t2 - _t1;
+    // private _msg = format ["Terrain getting took %1 seconds", _time];
+    // systemChat _msg;
     [_pairs, _widthToEdge, _blendTrenchEnds, _trueDepth, _cellSize] call FUNC(handleTerrain);
+    // private _t3 = diag_tickTime;
+    // private _time2 = _t3 - _t2;
+    // private _msg2 = format ["Terrain handling took %1 seconds", _time2];
+    // systemChat _msg2;
 };
 
 // Create new objs
 [_nodes] call trencher_main_fnc_handleObjects;
-// Copy arr as to not iterate whilst modifying
-[_nodes] call trencher_main_fnc_handleObjectAdditions;
+[_nodes, _controller] call trencher_main_fnc_handleObjectAdditions;
 
 // Write to SQM
 call FUNC(writeToSQM);
+
+_controller setVariable [QGVAR(locked), false];

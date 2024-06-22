@@ -2,21 +2,27 @@
 // Deletes all trench pieces and restores terrain to original height.
 params ["_nodes"];
 {
-    private _node = _x;        
-    {
-        deleteVehicle _x;
-    } forEach (_node getVariable [QGVAR(simpleObjects), []]);
-    _node setVariable [QGVAR(simpleObjects), []];
-    
-    {
-        deleteVehicle _x;
-    } forEach (_node getVariable [QGVAR(simulatedObjects), []]);
-    _node setVariable [QGVAR(simulatedObjects), []];
-    
-    {
-        deleteVehicle _x;
-    } forEach (_node getVariable [QGVAR(trenchPieces), []]);
-    _node setVariable [QGVAR(trenchPieces), []];
+    private _node = _x;
+
+    private _objArrayVars = [
+        QGVAR(simpleObjects),
+        QGVAR(simulatedObjects),
+        QGVAR(trenchPieces),
+        QGVAR(edenObjects)
+    ];
+
+    _objArrayVars apply {
+        private _varName = _x;
+        private _objs = +(_node getVariable [_varName, []]);
+        [_objs] spawn {
+            params ["_objs"];
+            sleep (random 1);
+            {
+                deleteVehicle _x;
+            } forEach _objs;
+        };
+        _node setVariable [_varName, []];
+    };
 
     private _points = _node getVariable [
         QGVAR(terrainPointsSet),

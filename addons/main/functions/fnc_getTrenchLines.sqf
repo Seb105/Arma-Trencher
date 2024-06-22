@@ -11,9 +11,7 @@ _nodes apply {
     // Sorting the connection means that any an angle drawn between two nodes that are next to eachother
     // in this list will not sweep over another branch of the trench coming off this node
     private _connections = [
-        (get3DENConnections _x) apply {
-            _x#1
-        },
+        _node getVariable QGVAR(connections),
         [_node],
         {
             _input0 getDir _x

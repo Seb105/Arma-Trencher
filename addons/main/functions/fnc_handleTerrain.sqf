@@ -11,30 +11,34 @@ _pairs apply {
     private _pair = _x;
     _pair params ["_node1", "_node2"];
     private _terrainPoints = _node1 getVariable QGVAR(terrainPoints);
-    private _terrainPointsFiltered = [];
-    while {count _terrainPoints > 0} do {
-        private _point = _terrainPoints#0;
-        private _matching = _allTerrainPoints select {_x#0 isEqualTo _point#0 && {_x#1 isEqualTo _point#1}};
-        _terrainPoints = _terrainPoints - _matching;
-        private _matchingCount = count _matching;
-        if (_matchingCount > 1) then {
-            // private _matchingZ = 0;
-            // {
-            //     _matchingZ = _x#2 + _matchingZ;
-            // } forEach _matching;
-            // _matchingZ = _matchingZ / _matchingCount;
-            private _matchingZ = selectMin (_matching apply {_x#2});
-            _point set [2, _matchingZ];
-        };
-        _terrainPointsFiltered pushBack _point;
-    };
+    private _terrainPointsFiltered = +_terrainPoints;
+    // private _t1 = diag_tickTime;
+    // TODO: Code works but make this not slow as shit.
+    // private _terrainPointsFiltered = [];
+    // while {count _terrainPoints > 0} do {
+    //     private _point = _terrainPoints#0;
+    //     private _matching = _allTerrainPoints select {_x#0 isEqualTo _point#0 && {_x#1 isEqualTo _point#1}};
+    //     _terrainPoints = _terrainPoints - _matching;
+    //     private _matchingCount = count _matching;
+    //     if (_matchingCount > 1) then {
+    //         private _matchingZ = 0;
+    //         {
+    //             _matchingZ = _x#2 + _matchingZ;
+    //         } forEach _matching;
+    //         _matchingZ = _matchingZ / _matchingCount;
+    //         // private _matchingZ = selectMin (_matching apply {_x#2});
+    //         _point set [2, _matchingZ];
+    //     };
+    //     _terrainPointsFiltered pushBack _point;
+    // };
+    // systemChat str ["Filtered in", _t2-_t1];
     // Subtract the depth of trench
     // Restore end piece to blend transition
     if (_blendTrenchEnds) then {
-        private _endPieces = _pair select {count get3DENConnections _x <= 1};
+        private _endPieces = _pair select {count (_x getVariable QGVAR(connections)) <= 1};
         {
             private _node = _x;
-            private _connection = ((get3DENConnections _node)#0)#1;
+            private _connection = (_x getVariable QGVAR(connections))#0;
             private _nodePos = getPosASL _node;
             private _connectionPos = getPosASL _connection;
             _nodePos set [2, 0];
