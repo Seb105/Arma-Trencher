@@ -41,7 +41,7 @@ params ["_nodes"];
         QGVAR(lines),
         QGVAR(ends),
         QGVAR(toPlace),
-        QGVAR(toHideAreas),
+        QGVAR(toHideAreass),
         QGVAR(toPlace),
         QGVAR(terrainPoints)
     ] apply {

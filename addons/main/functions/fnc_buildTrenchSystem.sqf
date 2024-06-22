@@ -76,22 +76,13 @@ if !(_skipObjects) then {
 };
 // Get objs to hide
 if !(_skipHidingObjects) then {
-    [_pairs, _trenchWidth + SEGMENT_WIDTH] call FUNC(getObjsToHide)
+    [_nodes, _trenchWidth + SEGMENT_WIDTH] call FUNC(getObjsToHide)
 };
 
 // Handle terrain
 if !(_skipTerrain) then {
-    // private _t1 = diag_tickTime;
     [_pairs, _widthToEdge, _widthToObj, _cellSize, _trueDepth] call FUNC(getTerrainPoints);
-    // private _t2 = diag_tickTime;
-    // private _time = _t2 - _t1;
-    // private _msg = format ["Terrain getting took %1 seconds", _time];
-    // systemChat _msg;
     [_pairs, _widthToEdge, _blendTrenchEnds, _trueDepth, _cellSize] call FUNC(handleTerrain);
-    // private _t3 = diag_tickTime;
-    // private _time2 = _t3 - _t2;
-    // private _msg2 = format ["Terrain handling took %1 seconds", _time2];
-    // systemChat _msg2;
 };
 
 // Create new objs

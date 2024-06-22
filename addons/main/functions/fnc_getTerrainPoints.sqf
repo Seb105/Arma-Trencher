@@ -1,5 +1,6 @@
 #include "script_component.hpp"
-params ["_pairs", "_widthToEdge", "_widthToObj", "_cellSize", "_trueDepth"];
+params ["_nodes", "_widthToEdge", "_widthToObj", "_cellSize", "_trueDepth"];
+POINTS = [];
 {
     _x params ["_startNode", "_endNode"];
     private _terrainPoints = _startNode getVariable [QGVAR(terrainPoints), []];

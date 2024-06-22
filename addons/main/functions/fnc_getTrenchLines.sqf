@@ -1,6 +1,5 @@
 #include "script_component.hpp"
 params ["_nodes", "_trenchWidth", "_widthToEdge"];
-LINES = [];
 _nodes apply {
     private _lines = [];
     private _ends  = [];
@@ -118,12 +117,6 @@ _nodes apply {
             _lines pushBack [_o1, _o2];
             _ends pushBack [_o2, _o3, _relAngle];
             _lines pushBack [_o3, _o4];
-
-            LINES append [
-                [+_o1, +_o2],
-                [+_o2, +_o3],
-                [+_o3, +_o4]
-            ];
         } forEach _connections;
     };
     _node setVariable [QGVAR(lines), _lines];

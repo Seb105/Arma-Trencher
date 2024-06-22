@@ -12,6 +12,7 @@ _nodes apply {
     private _simulatedObjects = _node getVariable QGVAR(simulatedObjects);
     private _simpleObjects = _node getVariable QGVAR(simpleObjects);
     private _trenchPieces = _node getVariable QGVAR(trenchPieces);
+    private _edenObjects = _node getVariable QGVAR(edenObjects);
 
     (+_trenchPieces) apply {
         private _trenchPiece = _x;
@@ -288,7 +289,18 @@ _nodes apply {
                 _trenchPieces pushBack _extraHorizontal;
             };
         };
-    };
 
-    private _connections = _node getVariable QGVAR(connections);
+        if (_aiBuildingPositions isNotEqualTo -1) then {
+            private _pos = [getPos _trenchPiece, _pieceDir, 2] call FUNC(offset);
+            _pos set [2, getTerrainHeightASL _pos];
+            private _garrison = createVehicle ["CBA_BuildingPos", _pos];
+            _garrison setPosASL _pos;
+            _simpleObjects pushBack _garrison;
+            if (_aiBuildingPositions isEqualTo 1) then {
+                private _dummy = createSimpleObject ["Sign_Sphere100cm_F", _pos];
+                _dummy setPosASL _pos;
+                _edenObjects pushBack _dummy;
+            };
+        };
+    };
 };

@@ -21,12 +21,12 @@ _pairs apply {
     //     _terrainPoints = _terrainPoints - _matching;
     //     private _matchingCount = count _matching;
     //     if (_matchingCount > 1) then {
-    //         private _matchingZ = 0;
-    //         {
-    //             _matchingZ = _x#2 + _matchingZ;
-    //         } forEach _matching;
-    //         _matchingZ = _matchingZ / _matchingCount;
-    //         // private _matchingZ = selectMin (_matching apply {_x#2});
+    //         // private _matchingZ = 0;
+    //         // {
+    //         //     _matchingZ = _x#2 + _matchingZ;
+    //         // } forEach _matching;
+    //         // _matchingZ = _matchingZ / _matchingCount;
+    //         private _matchingZ = selectMin (_matching apply {_x#2});
     //         _point set [2, _matchingZ];
     //     };
     //     _terrainPointsFiltered pushBack _point;
@@ -36,7 +36,8 @@ _pairs apply {
     // Restore end piece to blend transition
     if (_blendTrenchEnds) then {
         private _endPieces = _pair select {count (_x getVariable QGVAR(connections)) <= 1};
-        {
+        _endPieces apply {
+            // systemChat str _x;
             private _node = _x;
             private _connection = (_x getVariable QGVAR(connections))#0;
             private _nodePos = getPosASL _node;
@@ -72,7 +73,7 @@ _pairs apply {
                 _newPoint set [2, _blendedZ];
             };
             // _restoredPoints append _restored;
-        } forEach _endPieces;
+        };
     };
     [_terrainPointsFiltered, true, true] call TerrainLib_fnc_setTerrainHeight;
     _node1 setVariable [QGVAR(terrainPointsSet), _terrainPointsFiltered];

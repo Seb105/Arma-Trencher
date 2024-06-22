@@ -36,11 +36,10 @@ _module addEventHandler ["UnregisteredFromWorld3DEN", {
     };
 }];
 
-// if !(isNil QGVAR(lastPlaced)) then {
-//     private _lastPlaced = GVAR(lastPlaced);
-//     // Sync if you can see the last placed object
-//     if (worldToScreen (getPos _lastPlaced) isNotEqualTo []) then {
-//         add3DENConnection ["Sync", [_lastPlaced], _module];// Set random start on marker "marker_0" for all selected o
-//     }
-// };
-// GVAR(lastPlaced) = _module;
+if !(isNil QGVAR(lastPlaced) && time > 1) then {
+    private _lastPlaced = GVAR(lastPlaced);
+    if (_lastPlaced distance _module < 100) then {
+        add3DENConnection ["Sync", [_lastPlaced], _module];// Set random start on marker "marker_0" for all selected o
+    };
+};
+GVAR(lastPlaced) = _module;
