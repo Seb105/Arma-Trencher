@@ -12,7 +12,7 @@ private _ehs = [
         params ["_object"];
         if (time < 1) exitWith {};
         _object call FUNC(buildTrenchSystem);
-        systemChat str [get3DENEntityID _object, _thisEvent];
+        // systemChat str [get3DENEntityID _object, _thisEvent];
         // [_object, diag_frameNo] spawn {
         //     params ["_object", "_frameNo"];
         //     waitUntil {diag_frameNo > _frameNo};

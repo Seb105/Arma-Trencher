@@ -39,7 +39,7 @@ if (_thisSegmentOnly) then {
         count (_nodes arrayIntersect _x) > 0;
     };
 };
-systemChat str [count _nodes, count _pairs];
+// systemChat str [count _nodes, count _pairs];
 // Cleanup existing objs 
 [_nodes] call trencher_main_fnc_cleanUpNodes;
 _nodes apply {
@@ -49,30 +49,31 @@ _nodes apply {
 
 
 private _depth = _controller getVariable "TrenchDepth";
-private _trenchWidth = _controller getVariable "TrenchWidth";
+private _trenchWidth = (_controller getVariable "TrenchWidth") max 0;
 private _pitch = _controller getVariable "TrenchPitch"; // SLope of the trench walls
 private _blendTrenchEnds = _controller getVariable "BlendEnds";
 private _skipTerrain = _controller getVariable "SkipTerrain";
 private _skipObjects = _controller getVariable "SkipObjects";
 private _skipHidingObjects = _controller getVariable "SkipHidingObjects";
 
-
-private _minTrenchWidth = (_cellSize/2) * (sqrt 2);
-if (_trenchWidth < _minTrenchWidth) then {
-    _trenchWidth = _minTrenchWidth;
-    private _msg = format ["Terrain cell size is %1. Trench width cannot be less than (cellsize/2) * √2. Defaulting to %2", _cellSize, _trenchWidth];
-    [_msg, 1, 5, true, 0] call BIS_fnc_3DENNotification;
-    _controller setVariable ["TrenchWidth", _trenchWidth];
+private _numHorizontal = 1 + (_controller getVariable "AdditionalHorizSegments");
+private _objectsWidth = SEGMENT_WIDTH * _numHorizontal;
+private _minObjectsWidth = _cellSize * (sqrt 2);
+if (_objectsWidth < _minObjectsWidth) then {
+    private _recommendedExtraObjects = ceil (_minObjectsWidth / SEGMENT_WIDTH) - 1;
+    private _msg = format ["Terrain has large cell size of %1. Recommend setting 'Extra Horizontal Segments' to %2 to avoid gaps at edge of trench", _cellSize, _recommendedExtraObjects];
+    // [_msg, 1, 5, true, 0] call BIS_fnc_3DENNotification;
+    systemChat _msg;
 };
 
 
 // Get new objs to place
-private _widthToObj = (SEGMENT_WIDTH + _trenchWidth)/2;
-private _widthToEdge = _trenchWidth/2 + SEGMENT_WIDTH;
+// private _widthToObj = (SEGMENT_WIDTH + _trenchWidth)/2;
+private _widthToEdge = _trenchWidth/2 + (9-SEGMENT_WIDTH) + _objectsWidth;
 private _trueDepth = 0 max (_depth - SEGMENT_FALL);
 if !(_skipObjects) then {
     [_nodes, _trenchWidth, _widthToEdge] call FUNC(getTrenchLines);
-    [_nodes, _pitch, _trenchWidth] call FUNC(getTrenchObjects);
+    [_nodes, _pitch, _trenchWidth, _widthToEdge] call FUNC(getTrenchObjects);
 };
 // Get objs to hide
 if !(_skipHidingObjects) then {
@@ -81,8 +82,8 @@ if !(_skipHidingObjects) then {
 
 // Handle terrain
 if !(_skipTerrain) then {
-    [_pairs, _widthToEdge, _widthToObj, _cellSize, _trueDepth] call FUNC(getTerrainPoints);
-    [_pairs, _widthToEdge, _blendTrenchEnds, _trueDepth, _cellSize] call FUNC(handleTerrain);
+    [_nodes, _trenchWidth, _widthToEdge, _cellSize, _trueDepth] call FUNC(getTerrainPoints);
+    [_nodes, _widthToEdge, _blendTrenchEnds, _trueDepth, _cellSize] call FUNC(handleTerrain);
 };
 
 // Create new objs

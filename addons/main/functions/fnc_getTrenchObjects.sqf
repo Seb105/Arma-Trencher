@@ -1,6 +1,7 @@
 #include "script_component.hpp"
-params ["_nodes", "_pitch", "_trenchWidth"];
-private _distToOtherEdge = _trenchWidth + SEGMENT_WIDTH*1.5;
+params ["_nodes", "_pitch", "_trenchWidth", "_widthToEdge"];
+private _distToOtherEdge = _widthToEdge + SEGMENT_WIDTH_HALF + _trenchWidth/2;
+private _distToFront = _widthToEdge - SEGMENT_WIDTH_HALF - _trenchWidth/2;
 _nodes apply {
     private _toPlace = [];
     private _node = _x;
@@ -31,7 +32,7 @@ _nodes apply {
         // that both sides are the same height.
         // private _offsetToBack = [[0,0,0], _dir-90, SEGMENT_WIDTH_HALF] call FUNC(offset);
         private _offsetToOtherSide = [[0,0,0], _dir-90, _distToOtherEdge] call FUNC(offset);
-        private _offsetToFront = [[0,0,0], _dir+90, SEGMENT_WIDTH_HALF] call FUNC(offset);
+        private _offsetToFront = [[0,0,0], _dir+90, _distToFront] call FUNC(offset);
         if (_isSinglePoint) then {
             _numSegments = 0;
             _objCentreStart = (_objCentreStart vectorAdd _objCentreEnd) vectorMultiply 0.5;

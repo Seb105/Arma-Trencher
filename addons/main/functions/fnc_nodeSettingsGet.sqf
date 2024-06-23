@@ -9,6 +9,7 @@ private _names = [
     "DoSandbags",
     "DoBarbedWire",
     "TankTrapType",
+    "AiBuildingPosition",
     "AdditionalHorizSegments",
     "SkipTerrain",
     "SkipObjects",

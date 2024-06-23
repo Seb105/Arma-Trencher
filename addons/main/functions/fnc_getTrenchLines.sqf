@@ -1,8 +1,10 @@
 #include "script_component.hpp"
 params ["_nodes", "_trenchWidth", "_widthToEdge"];
+// POLYGONS = [];
 _nodes apply {
     private _lines = [];
     private _ends  = [];
+    private _polygon = [];
     private _node = _x;
     private _nodePos = getPosASL _node;
     // systemChat str _node;
@@ -117,8 +119,29 @@ _nodes apply {
             _lines pushBack [_o1, _o2];
             _ends pushBack [_o2, _o3, _relAngle];
             _lines pushBack [_o3, _o4];
+
+            _polygon append [_o2, _o3];
+            // POLYGONS append [_o2, _o3];
         } forEach _connections;
     };
+    // if (count _polygon > 0) then {
+    //     POLYGONS pushBack +_polygon;
+    // };
+    // Set all ends of this trench to the lowest Z of all ends
+    // private _lowestZ = selectMin (_ends apply {
+    //     _x params ["_p1", "_p2"];
+    //     private _pairZ = [_p1, _p2] apply {_x#2};
+    //     selectMin _pairZ
+    // });
+    // systemChat str _lowestZ;
+    // // This will apply to _lines too as they are references to the same array
+    // _ends apply {
+    //     _x params ["_p1", "_p2"];
+    //     _p1 set [2, _lowestZ];
+    //     _p2 set [2, _lowestZ];
+    // };
+
+    _node setVariable [QGVAR(polygon), _polygon];
     _node setVariable [QGVAR(lines), _lines];
     _node setVariable [QGVAR(ends), _ends];
 };

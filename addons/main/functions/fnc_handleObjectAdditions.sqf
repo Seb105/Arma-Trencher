@@ -274,7 +274,7 @@ _nodes apply {
         };
         if (_extraHorizSegments > 0) then {
             for "_i" from 1 to _extraHorizSegments do {
-                private _relativePos = [0,-8.155,-0.671] vectorMultiply _i;
+                private _relativePos = [0,-SEGMENT_WIDTH,-0.671] vectorMultiply _i;
                 private _dirAndUp = [[0,1,0],[0,0,1]] apply {
                     _trenchPiece vectorModelToWorld _x
                 };
@@ -284,6 +284,7 @@ _nodes apply {
                 _extraHorizontal setVectorDirAndUp _dirAndUp;
                 _extraHorizontal enableSimulationGlobal false;
                 _extraHorizontal setObjectTextureGlobal [0, (surfaceTexture _posASL)];
+                _extraHorizontal setObjectMaterialGlobal [0, SEGMENT_MATERIAL];
                 _extraHorizontal hideSelection ["snow", true];
                 // _wallPieces pushBack _extraHorizontal;
                 _trenchPieces pushBack _extraHorizontal;
