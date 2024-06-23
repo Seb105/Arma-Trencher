@@ -34,6 +34,12 @@ _module addEventHandler ["UnregisteredFromWorld3DEN", {
         waitUntil {diag_frameNo > _frameNo};
         _connections apply {_x call FUNC(buildTrenchSystem)};
     };
+
+    // Write blank SQM if no nodes are left.
+    private _allNodes = ((all3DENEntities)#3) select {_x isKindOf QGVAR(Module_TrenchPiece)};
+    if (count _allNodes == 0) then {
+        call FUNC(writeToSQM);
+    }
 }];
 
 if !(isNil QGVAR(lastPlaced) && time > 1) then {
