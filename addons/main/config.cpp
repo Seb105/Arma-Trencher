@@ -192,6 +192,28 @@ class CfgVehicles
                     };
                 };
             };
+            class AiBuildingPosition 
+            {
+                displayName = "AI Building Positions";
+                description = "Add points AI to garrison in  the trench";
+                class Values {
+                    class None {
+                        default = 1;
+                        name = "None";
+                        value = -1;
+                    };
+                    class Waypoint {
+                        default = 0;
+                        name = "Yes";
+                        value = 0;
+                    };
+                    class WaypointVisualised {
+                        default = 0;
+                        name = "Yes (Eden Visualisation)";
+                        value = 1;
+                    };
+                };
+            };
             class AdditionalHorizSegments
             {
                 displayName = "Extra Horizontal Segments";
