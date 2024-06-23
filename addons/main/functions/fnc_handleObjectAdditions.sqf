@@ -296,7 +296,7 @@ _nodes apply {
             _pos set [2, getTerrainHeightASL _pos];
             private _garrison = createVehicle ["CBA_BuildingPos", _pos];
             _garrison setPosASL _pos;
-            _simpleObjects pushBack _garrison;
+            _simulatedObjects pushBack _garrison;
             if (_aiBuildingPositions isEqualTo 1) then {
                 private _dummy = createSimpleObject ["Sign_Sphere100cm_F", _pos];
                 _dummy setPosASL _pos;
