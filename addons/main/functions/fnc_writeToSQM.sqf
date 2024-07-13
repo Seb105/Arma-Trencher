@@ -26,10 +26,10 @@ _allNodes apply {
     };
 };
 set3DENMissionAttributes [
-    [QUOTE(ADDON), QGVAR(simpleObjects), _simpleObjects],
-    [QUOTE(ADDON), QGVAR(simulatedObjects), _simulatedObjects],
-    [QUOTE(ADDON), QGVAR(trenchPieces), _trenchPieces],
-    [QUOTE(ADDON), QGVAR(hideAreas), _hideAreas],
-    [QUOTE(ADDON), QGVAR(terrainPoints), _terrainPoints]
+    [QUOTE(ADDON), QGVAR(simpleObjects), str _simpleObjects],
+    [QUOTE(ADDON), QGVAR(simulatedObjects), str _simulatedObjects],
+    [QUOTE(ADDON), QGVAR(trenchPieces), str _trenchPieces],
+    [QUOTE(ADDON), QGVAR(hideAreas), str _hideAreas],
+    [QUOTE(ADDON), QGVAR(terrainPoints), str _terrainPoints]
 ];
 // do3DENAction "MissionSave";

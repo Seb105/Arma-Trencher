@@ -3,7 +3,7 @@ params ["_nodes", "_trenchWidth", "_widthToEdge", "_cellSize", "_trueDepth"];
 private _offset = _cellSize * 1.41421356;
 // POINTS = [];
 private _lowerWidth = (_trenchWidth/2) + _offset;
-private _modifyWidth = (_widthToEdge-_offset) max _lowerWidth;
+private _modifyWidth = (_widthToEdge) max _lowerWidth;
 _nodes apply {
     private _startNode = _x;
     private _connections = _startNode getVariable QGVAR(connections);
