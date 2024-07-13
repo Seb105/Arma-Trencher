@@ -14,7 +14,7 @@
 #define SEGMENT_WIDTH 8.155
 #define SEGMENT_WIDTH_HALF (SEGMENT_WIDTH/2)
 #define SEGMENT_SLOPE_TOP 2.7
-#define SEGMENT_SLOPE_BOTTOM 2.2
+#define SEGMENT_SLOPE_BOTTOM 2.1
 #define SEGMENT_FALL (SEGMENT_SLOPE_TOP-SEGMENT_SLOPE_BOTTOM)
 #define SEGMENT_MATERIAL "\A3\Structures_F_Enoch\Military\Training\Data\ShellCrater_02_decal_F.rvmat"
 

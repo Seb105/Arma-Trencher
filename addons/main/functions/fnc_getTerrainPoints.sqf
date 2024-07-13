@@ -1,16 +1,17 @@
 #include "script_component.hpp"
 params ["_nodes", "_trenchWidth", "_widthToEdge", "_cellSize", "_trueDepth"];
-private _offset = _cellSize * 1.41421356;
+// private _offset = _cellSize * 1.41421356;
 // POINTS = [];
-private _lowerWidth = (_trenchWidth/2) + _offset;
-private _modifyWidth = (_widthToEdge) max _lowerWidth;
+// private _lowerWidth = (_trenchWidth/2) + _offset;
+// private _modifyWidth = (_widthToEdge) max (_lowerWidth);
 _nodes apply {
     private _startNode = _x;
     private _connections = _startNode getVariable QGVAR(connections);
     private _terrainPoints = [];
-    private _overlapping = [];
     private _startNodePos = getPosASL _startNode;
     private _polygon = _startNode getVariable QGVAR(polygon);
+    // private _overlapping = ([_startNodePos, _trenchWidth*2, _trenchWidth*2, 0, false, -1] call TerrainLib_fnc_getAreaTerrainGrid) select {_x inPolygon _polygon};
+    private _overlapping = [];
     _startNodePos set [2, 0];
     private _blendEnds = count _connections == 1;
     _connections apply {
@@ -18,6 +19,10 @@ _nodes apply {
         private _endNodePos = getPosASL _endNode;
         _endNodePos set [2, 0];
         private _dir = _startNodePos getDir _endNodePos;
+        // Offset oscillates between 1 and 1.42 * _cellSize every 45 degrees, to account for the hypotenuse of a terrain grid
+        private _offset = (1 + (abs(sin(2*_dir)) * 0.41421356)) * _cellSize;
+        private _lowerWidth = (_trenchWidth/2) + _offset;
+        private _modifyWidth = (_widthToEdge + _offset) max (_lowerWidth);
         private _vectorDist = _endNodePos vectorDiff _startNodePos;
         private _center = (_startNodePos vectorAdd _endNodePos) vectorMultiply 0.5;
         private _quarter = (_startNodePos vectorAdd (_vectorDist vectorMultiply 0.25));
@@ -33,10 +38,11 @@ _nodes apply {
         private _blendLength = ((_trueDepth * 4) max (_offset*2)) min (_length*0.75);
         private _selectedPoints = [];
         _newPoints apply {
-            private _sub = [0, _trueDepth] select (_x inArea _lowerArea);
+            private _point = _x;
+            private _sub = [0, _trueDepth] select (_point inArea _lowerArea);
             // This extracts the width along the trench of the point, ignoring the length component
-            private _dirToStart = (_startNodePos getDir _x) - _dir;
-            private _distToCenter  = _x distance2D _startNodePos;
+            private _dirToStart = (_startNodePos getDir _point) - _dir;
+            private _distToCenter  = _point distance2D _startNodePos;
 
             private _xCompontent = _distToCenter * cos _dirToStart;
             private _centreLine = _startNodePos vectorAdd (_fromTo vectorMultiply _xCompontent);
@@ -45,19 +51,18 @@ _nodes apply {
                 getTerrainHeightASL (_centreLine vectorAdd _offsetRight)
             ];
             // private _yComponent = _distToCenter * sin _dirToStart;
-            // POINTS pushBack [_x, str [_xCompontent, _yComponent]];
             private _newHeight = _height - _sub;
             if (_xCompontent < _blendLength && _blendEnds) then {
-                private _currentHeight = _x select 2;
+                private _currentHeight = _point select 2;
                 private _blend = (1 min _xCompontent / _blendLength) max 0;
                 _newHeight = _newHeight * _blend + _currentHeight * (1 - _blend);
             };
 
-            _x set [2, _newHeight];
+            _point set [2, _newHeight];
             if (_x inPolygon _polygon) then {
-                _overlapping pushBack _x;
+                _overlapping pushBack _point;
             } else {
-                _selectedPoints pushBack _x;
+                _selectedPoints pushBack _point;
             };
         };
         _terrainPoints append _selectedPoints;

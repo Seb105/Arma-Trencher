@@ -1,5 +1,5 @@
 #include "script_component.hpp"
-params ["_nodes", "_trenchWidth"];
+params ["_nodes", "_searchWidth"];
 
 _nodes apply {
     private _connections = _x getVariable QGVAR(connections);
@@ -17,10 +17,10 @@ _nodes apply {
         private _vectorFromTo = _n2Pos vectorDiff _n1Pos;
         private _quarterPoint = (_n1Pos vectorAdd (_vectorFromTo vectorMultiply 0.25));
         private _dist = _n1Pos distance2D _n2Pos;
-        private _radius = sqrt (_trenchWidth^2 + _dist^2) / 2;
+        private _radius = sqrt (_searchWidth^2 + _dist^2) / 2;
         private _area = [
             _quarterPoint,
-            _trenchWidth/2,
+            _searchWidth,
             _dist/4,
             _dir,
             true

@@ -1,5 +1,5 @@
 #include "script_component.hpp"
-params ["_nodes", "_trenchWidth", "_widthToEdge"];
+params ["_nodes", "_trenchWidth", "_widthToEdge", "_numHorizontal"];
 // POLYGONS = [];
 _nodes apply {
     private _lines = [];
@@ -74,7 +74,7 @@ _nodes apply {
             private _tangent = tan (90 - _relAngle/2);
             private _sub = (_trenchWidth/2)  * _tangent;
             private _angleC = _relAngle;
-            private _lengthC = SEGMENT_LENGTH;
+            private _lengthC = SEGMENT_LENGTH * _numHorizontal;
             private _angleA = (180 - _relAngle)/2;
             private _lengthA = ((_lengthC/sin _angleC) * sin _angleA) + 0.1;
             private _distances = [_start distance2d _nodePos, _nodePos distance2d _end] apply {

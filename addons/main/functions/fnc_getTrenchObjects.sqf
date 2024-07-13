@@ -1,5 +1,5 @@
 #include "script_component.hpp"
-params ["_nodes", "_pitch", "_trenchWidth", "_widthToEdge"];
+params ["_nodes", "_pitch", "_trenchWidth", "_widthToEdge", "_numHorizontal"];
 private _distToOtherEdge = _widthToEdge + SEGMENT_WIDTH_HALF + _trenchWidth/2;
 private _distToFront = _widthToEdge - SEGMENT_WIDTH_HALF - _trenchWidth/2;
 _nodes apply {
@@ -68,24 +68,37 @@ _nodes apply {
     _ends apply {
         _x params ["_start", "_end", "_relAngle"];
         private _dir = _start getDir _end;
+        private _long = _relAngle > 190;
+    
         private _pieceDir = _dir - 90;
-        private _edgeCentre = (_start vectorAdd _end) vectorMultiply 0.5;
 
-        private _objCentre = [_edgeCentre, _dir+90, SEGMENT_WIDTH_HALF] call FUNC(offset);
+        // private _edgeCentre = (_start vectorAdd _end) vectorMultiply 0.5;
+        // private _objCentre = [_edgeCentre, _dir+90, SEGMENT_WIDTH_HALF] call FUNC(offset);
 
+        private _diff = _end vectorDiff _start;
         private _currentHeight = _start#2;
         private _nextHeight = _end#2;
+        private _heightDiff = _currentHeight - _nextHeight;
         private _dist = _start distance2d _end;
         private _fall = _nextHeight - _currentHeight;
         private _pieceRoll = -asin (_fall / _dist min 1 max -1); // Errors if fall is too steep
 
-        _objCentre set [2, (_currentHeight + _nextHeight)/2 - SEGMENT_SLOPE_BOTTOM];
+        // private _height = (_currentHeight + _nextHeight)/2 - SEGMENT_SLOPE_BOTTOM;
+        // _objCentre set [2, _height];
         private _vectorDirAndUp = [
             [sin _pieceDir * cos _pitch, cos _pieceDir * cos _pitch, sin _pitch],
             [[sin _pieceRoll, -sin _pitch, cos _pieceRoll * cos _pitch], -_pieceDir] call BIS_fnc_rotateVector2D
         ];
-        private _long = _relAngle > 190;
-        _toPlace pushBack [_objCentre, _vectorDirAndUp, _long];
+        for "_i" from 1 to _numHorizontal do {
+            private _isEnd = (_i == _numHorizontal || _i == 1) && _long;
+            private _proportion = (_i-0.5) / _numHorizontal;
+            private _height = _currentHeight - _heightDiff*_proportion - SEGMENT_SLOPE_BOTTOM;
+            private _offset = _diff vectorMultiply _proportion;
+            private _edgeCentre = _start vectorAdd _offset;
+            private _objCentre = [_edgeCentre, _dir+90, SEGMENT_WIDTH_HALF] call FUNC(offset);
+            _objCentre set [2, _height];
+            _toPlace pushBack [_objCentre, _vectorDirAndUp, _isEnd];
+        };
     };
     _node setVariable [QGVAR(toPlace), _toPlace];
 };
