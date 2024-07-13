@@ -4,6 +4,9 @@ params ["_origin", ["_thisSegmentOnly", true]];
 private _controllers = _allNodes select {
     _x isKindOf "trencher_main_Module_TrenchController"
 };
+
+
+
 if (count _controllers > 1) exitWith {
     ["A trench can only have 1 controller module synced", 1, 5, true, 0.5] call BIS_fnc_3DENNotification;
     [_allNodes] call trencher_main_fnc_cleanUpNodes;
@@ -19,12 +22,6 @@ private _cellSize = (getTerrainInfo)#2;
 private _controller = _controllers#0;
 
 // Check if we need to update. As you can modify more than one trench at a time, we need to check if the last frame we updated this trench was the current frame
-// private _frame = diag_frameNo;
-// if (_controller getVariable [QGVAR(lastFrame), -1] == _frame) exitWith {};
-// _controller setVariable [QGVAR(lastFrame), _frame];
-if (_controller getVariable [QGVAR(locked), false]) exitWith {};
-_controller setVariable [QGVAR(locked), true];
-
 private _controllerSettings = [_controller] call FUNC(nodeSettingsGet);
 private _nodes = _allNodes;
 private _pairs = _allPairs;
@@ -40,7 +37,17 @@ if (_thisSegmentOnly) then {
     };
 };
 // systemChat str [count _nodes, count _pairs];
-// Cleanup existing objs 
+// Don't update objects that have already been updated this frame
+private _frame = diag_frameNo; 
+_nodes = _nodes select {
+    private _frameNo = _x getVariable [QGVAR(frameNo), -1];
+    _frameNo isNotEqualTo _frame
+};
+_nodes apply {
+    _x setVariable [QGVAR(frameNo), _frame];
+};
+
+// Cleanup existing objs
 [_nodes] call trencher_main_fnc_cleanUpNodes;
 _nodes apply {
     // systemChat str _controllerSettings;
@@ -92,5 +99,5 @@ if !(_skipTerrain) then {
 
 // Write to SQM
 call FUNC(writeToSQM);
-
-_controller setVariable [QGVAR(locked), false];
+// systemChat str ["Trench system updated", _origin];
+// _controller setVariable [QGVAR(locked), false];

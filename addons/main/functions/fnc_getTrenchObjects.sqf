@@ -5,6 +5,13 @@ private _distToFront = _widthToEdge - SEGMENT_WIDTH_HALF - _trenchWidth/2;
 _nodes apply {
     private _toPlace = [];
     private _node = _x;
+
+    private _skippers = (_node getVariable QGVAR(skippers)) select {
+        _x getVariable QGVAR(segmentSkip)
+    } apply {
+        _x getVariable QGVAR(area)
+    };
+    
     private _lines = _node getVariable QGVAR(lines);
     private _ends = _node getVariable QGVAR(ends);
     _lines apply {
@@ -41,6 +48,7 @@ _nodes apply {
         };
         for "_i" from (0) to (_numSegments) do {
             private _objCentre = _objCentreStart vectorAdd (_segmentOffset vectorMultiply _i);
+            if (_skippers findIf {_objCentre inArea _x} isNotEqualTo -1) then {continue};
             private _segmentStartPos = _objCentre vectorAdd _inverseHalfSegmentOffset;
             private _segmentEndPos = _objCentre vectorAdd _halfSegmentOffset;
             private _segmentFrontStart = _segmentStartPos vectorAdd _offsetToFront;
@@ -96,6 +104,7 @@ _nodes apply {
             private _offset = _diff vectorMultiply _proportion;
             private _edgeCentre = _start vectorAdd _offset;
             private _objCentre = [_edgeCentre, _dir+90, SEGMENT_WIDTH_HALF] call FUNC(offset);
+            if (_skippers findIf {_objCentre inArea _x} isNotEqualTo -1) then {continue};
             _objCentre set [2, _height];
             _toPlace pushBack [_objCentre, _vectorDirAndUp, _isEnd];
         };

@@ -51,7 +51,7 @@ class CfgVehicles
             class AnyBrain;
         };
     };
-    class GVAR(SkipArea): Module_F {
+    class GVAR(Module_TrenchSkipper): Module_F {
         author = "Seb";
         scope = 2;
         scopeCurator = 0;
@@ -64,12 +64,12 @@ class CfgVehicles
         canSetArea = 1;
         canSetAreaHeight = 0;
         canSetAreaShape = 1;
-        icon =  "\a3\Missions_F_Beta\data\img\iconMPTypeDefense_ca.paa";
-        portrait = "\a3\Missions_F_Beta\data\img\portraitMPTypeDefense_ca.paa";
+        icon =  "\a3\Modules_F_Curator\Data\iconRespawnTickets_ca.paa";
+        portrait = "\a3\Modules_F_Curator\Data\portraitRespawnTickets_ca.paa";
         class AttributeValues
         {
-            size3[] = {5,5,-1};
-            isRectangle = 0;
+            size3[] = {30,30,-1};
+            isRectangle = 1;
         };
         class Attributes: AttributesBase
         {
@@ -127,8 +127,9 @@ class CfgVehicles
                 displayName = "Skip Additional Horizontal Segments";
                 tooltip = "Hide additional horizontal segments in area";
                 typeName = "BOOL";
-                defaultValue = "true";
+                defaultValue = "false";
             };
+        };
     };
     class GVAR(Module_TrenchPiece): Module_F
     {
@@ -187,38 +188,40 @@ class CfgVehicles
                 property = "WallType";
                 displayName = "Wall Type";
                 tooltip = "Reinforce the trench wall with one of the folowing";
+                typeName = "STRING";
+                defaultValue = "-1";
                 class Values {
                     // Note: values are parsed as strings in game
                     class None {
                         default = 1;
                         name = "None";
-                        value = -1;
+                        value = "-1";
                     };
                     class Concrete {
                         default = 0;
                         name = "Concrete";
-                        value = 0;
+                        value = "0";
                     };
                     class Wood {
                         default = 0;
                         name = "Wood";
-                        value = 1;
+                        value = "1";
                     };
                     class Metal {
                         default = 0;
                         name = "Metal";
-                        value = 2;
+                        value = "2";
                     };
                     class Hesco {
                         default = 0;
                         name = "Hesco";
-                        value = 3;
+                        value = "3";
                     };
                     class HescoRamp
                     {
                         default = 0;
                         name = "Hesco (Ramp)";
-                        value = 4;
+                        value = "4";
                     };
                 };
             };
@@ -227,22 +230,24 @@ class CfgVehicles
                 property = "DoSandbags";
                 displayName = "Sandbags";
                 tooltip = "Add sandbags to lip of trench";
+                typeName = "STRING";
+                defaultValue = "-1";
                 class Values {
                     // Note: values are parsed as strings in game
                     class None {
                         default = 1;
                         name = "None";
-                        value = -1;
+                        value = "-1";
                     };
                     class Tan {
                         default = 0;
                         name = "Tan";
-                        value = 0;
+                        value = "0";
                     };
                     class Green {
                         default = 0;
                         name = "Green";
-                        value = 1;
+                        value = "1";
                     };
                 };
             };
@@ -259,45 +264,49 @@ class CfgVehicles
                 property = "TankTrapType";
                 displayName = "Tank traps";
                 tooltip = "Add tank traps to lip of trench";
+                typeName = "STRING";
+                defaultValue = "-1";
                 class Values {
                     // Note: values are parsed as strings in game
                     class None {
                         default = 1;
                         name = "None";
-                        value = -1;
+                        value = "-1";
                     };
                     class Hedgehog {
                         default = 0;
                         name = "Hedgehog";
-                        value = 0;
+                        value = "0";
                     };
                     class DragonTeeth {
                         default = 0;
                         name = "Dragon's Teeth";
-                        value = 1;
+                        value = "1";
                     };
                 };
             };
-            class AiBuildingPosition: Checkbox
+            class AiBuildingPosition: Combo
             {
                 property = "AiBuildingPosition";
                 displayName = "AI Building Positions";
                 tooltip = "Add points AI to garrison in  the trench";
+                typeName = "STRING";
+                defaultValue = "-1";
                 class Values {
                     class None {
                         default = 1;
                         name = "None";
-                        value = -1;
+                        value = "-1";
                     };
                     class Waypoint {
                         default = 0;
                         name = "Yes";
-                        value = 0;
+                        value = "0";
                     };
                     class WaypointVisualised {
                         default = 0;
                         name = "Yes (Eden Visualisation)";
-                        value = 1;
+                        value = "1";
                     };
                 };
             };
@@ -328,6 +337,7 @@ class CfgVehicles
                 
             class SkipHidingObjects: Checkbox
             {
+                property = "SkipHidingObjects";
                 displayName = "Skip Hiding Objects";
                 tooltip = "Skip hiding terrain objects in the trench area.";
                 typeName = "BOOL";

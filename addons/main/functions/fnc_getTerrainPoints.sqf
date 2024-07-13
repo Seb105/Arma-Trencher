@@ -5,7 +5,12 @@ params ["_nodes", "_trenchWidth", "_widthToEdge", "_cellSize", "_trueDepth", "_b
 // private _lowerWidth = (_trenchWidth/2) + _offset;
 // private _modifyWidth = (_widthToEdge) max (_lowerWidth);
 _nodes apply {
-    private _startNode = _x;
+    private _startNode = _x;    
+    private _skippers = (_startNode getVariable QGVAR(skippers)) select {
+        _x getVariable QGVAR(skipTerrain)
+    } apply {
+        _x getVariable QGVAR(area)
+    };
     private _connections = _startNode getVariable QGVAR(connections);
     private _terrainPoints = [];
     private _startNodePos = getPosASL _startNode;
@@ -39,6 +44,7 @@ _nodes apply {
         private _selectedPoints = [];
         _newPoints apply {
             private _point = _x;
+            if (_skippers findIf {_point inArea _x} isNotEqualTo -1) then {continue};
             private _sub = [0, _trueDepth] select (_point inArea _lowerArea);
             // This extracts the width along the trench of the point, ignoring the length component
             private _dirToStart = (_startNodePos getDir _point) - _dir;

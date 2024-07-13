@@ -1,11 +1,26 @@
 #include "script_component.hpp"
 params ["_nodes", "_controller", "_pitch"];
-private _wallType = parseNumber (_controller getVariable "WallType"); // Config values are strings
-private _sandBagType = parseNumber (_controller getVariable "DoSandbags");
-private _doBarbedWire = _controller getVariable "DoBarbedWire";
-private _tankTrapType = parseNumber (_controller getVariable "TankTrapType");
+// Default value of combos is always a number, but subsequent values are always strings so handle that
+private _combos = [
+    _controller getVariable "WallType",
+    _controller getVariable "DoSandbags",
+    _controller getVariable "TankTrapType",
+    _controller getVariable "AiBuildingPosition"
+] apply {
+    private _val = _x;
+    if (_x isEqualType "") then {
+        _val = parseNumber _val;
+    };
+    _val
+};
+_combos params [
+    "_wallType", 
+    "_sandBagType", 
+    "_tankTrapType", 
+    "_aiBuildingPositions"
+];
 private _extraHorizSegments = _controller getVariable "AdditionalHorizSegments";
-private _aiBuildingPositions = parseNumber (_controller getVariable "AiBuildingPosition");
+private _doBarbedWire = _controller getVariable "DoBarbedWire";
 
 _nodes apply {
     private _node = _x;
@@ -13,6 +28,18 @@ _nodes apply {
     private _simpleObjects = _node getVariable QGVAR(simpleObjects);
     private _trenchPieces = _node getVariable QGVAR(trenchPieces);
     private _edenObjects = _node getVariable QGVAR(edenObjects);
+
+    private _skippers = (_node getVariable QGVAR(skippers));
+
+    private _fnc_shouldPlace = {
+        params ["_pos", "_skippers", "_skipVar"];
+        private _relSkippers = _skippers select {
+            _x getVariable _skipVar
+        } apply {
+            _x getVariable QGVAR(area)
+        };
+        _relSkippers findIf {_pos inArea _x} isEqualTo -1
+    };
 
     (+_trenchPieces) apply {
         private _trenchPiece = _x;
@@ -148,6 +175,7 @@ _nodes apply {
                 _wallPieces apply {
                     private _wall = _x;
                     private _posASL = _wall modelToWorldWorld _relativePos;
+                    if !([_posASL, _skippers, QGVAR(wallSkip)] call _fnc_shouldPlace) then {continue};
                     private _vectorDirAndUp = _relativeDirAndUp apply {_wall vectorModelToWorld _x};
                     private _wallPiece = createSimpleObject [_type, _posASL];
                     _wallPiece setPosWorld _posASL;
@@ -157,10 +185,12 @@ _nodes apply {
                 };
             };
         };
+
         if (_doBarbedWire) then {
             private _relativePos = [0,1.113,2.348];
             private _relativeDirAndUp = [[0,0.994,0.108],[0,-0.108,0.994]];
             private _posASL = _trenchPiece modelToWorldWorld _relativePos;
+            if !([_posASL, _skippers, QGVAR(barbedWireSkip)] call _fnc_shouldPlace) exitWith {};
             private _vectorDirAndUp = _relativeDirAndUp apply {_trenchPiece vectorModelToWorld _x};
             // This object should be simulated so it can be destroyed.
             // Don't need to simulate it in eden but add to different array
@@ -170,6 +200,7 @@ _nodes apply {
             _barbedWire enableDynamicSimulation true;
             _simulatedObjects pushBack _barbedWire;
         };
+
         if (_sandBagType isNotEqualTo -1) then {
             private _sandbagClass = ["Land_BagFence_Long_F", "Land_BagFence_01_long_green_F"]#_sandBagType;
             [
@@ -191,6 +222,7 @@ _nodes apply {
             ] apply {
                 _x params ["_", "_relativePos", "_relativeDirAndUp"];
                 private _posASL = _trenchPiece modelToWorldWorld _relativePos;
+                if !([_posASL, _skippers, QGVAR(sandbagSkip)] call _fnc_shouldPlace) then {continue};
                 private _vectorDirAndUp = _relativeDirAndUp apply {_trenchPiece vectorModelToWorld _x};
                 private _sandbag = createSimpleObject [_sandbagClass, _posASL];
                 _sandbag setPosWorld _posASL;
@@ -199,6 +231,7 @@ _nodes apply {
                 _simpleObjects pushBack _sandbag;
             };
         };
+
         if (_tankTrapType isNotEqualTo -1) then {
             private _types = [
                 [
@@ -260,6 +293,7 @@ _nodes apply {
             _tankTraps apply {
                 _x params ["_type", "_relativePos", "_relativeDirAndUp"];
                 private _posASL = _trenchPiece modelToWorldWorld _relativePos;
+                if !([_posASL, _skippers, QGVAR(tankTrapSkip)] call _fnc_shouldPlace) then {continue};
                 private _vectorDirAndUp = _relativeDirAndUp apply {_trenchPiece vectorModelToWorld _x};
                 private _concPiece = createSimpleObject [_type, _posASL];
                 _concPiece setPosWorld _posASL;
@@ -268,6 +302,7 @@ _nodes apply {
                 _simpleObjects pushBack _concPiece;
             };
         };
+
         if (_extraHorizSegments > 0) then {
             for "_i" from 1 to _extraHorizSegments do {
                 private _relativePos = [0,-SEGMENT_WIDTH,-0.671] vectorMultiply _i;
@@ -275,6 +310,7 @@ _nodes apply {
                     _trenchPiece vectorModelToWorld _x
                 };
                 private _posASL = _trenchPiece modelToWorldWorld _relativePos;
+                if !([_posASL, _skippers, QGVAR(additonalHorizSkip)] call _fnc_shouldPlace) then {continue};
                 private _extraHorizontal = createSimpleObject [_pieceType, [0,0,0]];
                 _extraHorizontal setPosWorld _posASL;
                 _extraHorizontal setVectorDirAndUp _dirAndUp;
@@ -286,6 +322,7 @@ _nodes apply {
                 _trenchPieces pushBack _extraHorizontal;
             };
         };
+
         if (_aiBuildingPositions isNotEqualTo -1) then {
             private _pos = [getPos _trenchPiece, _pieceDir, 2] call FUNC(offset);
             _pos set [2, getTerrainHeightASL _pos];

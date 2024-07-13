@@ -1,18 +1,18 @@
 #include "script_component.hpp"
+
+[QGVAR(Module_TrenchSkipper), QGVAR(Module_TrenchPiece)] apply {
+    private _type = _x;
+    private _allType = (all3DENEntities#3) select {_x isKindOf _type};
+    _allType apply {_x call FUNC(registerEntity)};
+    [_type, "init", {_this call FUNC(registerEntity)}, true, []] call CBA_fnc_addClassEventHandler;
+};
+
 private _allTrenchNetworks = call FUNC(allTrenchNetworks);
 {
     private _origin = _x#0;
     // systemChat format ["Building trench system at %1", _origin];
     [_origin] call FUNC(buildTrenchSystem);
 } forEach _allTrenchNetworks;
-
-
-// This function runs every time the mission is loaded, but also every time the scenario preview is exited
-// We need to make sure that we don't register the entities multiple times
-private _allNodes = (all3DENEntities#3) select {_x isKindOf QGVAR(Module_TrenchPiece)};
-_allNodes apply {_x call FUNC(registerEntity)};
-[QGVAR(Module_TrenchPiece), "init", {_this call FUNC(registerEntity)}, true, []] call CBA_fnc_addClassEventHandler;
-
 
 // if (missionNameSpace getVariable [QGVAR(EHSADDED), false]) exitWith {
     // systemchat "Trenches already initialized";
