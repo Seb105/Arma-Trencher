@@ -51,7 +51,85 @@ class CfgVehicles
             class AnyBrain;
         };
     };
-
+    class GVAR(SkipArea): Module_F {
+        author = "Seb";
+        scope = 2;
+        scopeCurator = 0;
+        displayName = "Skip Area";
+        category = "Trench_Category";
+        isGlobal = 1;
+        isTriggerActivated = 0;
+        isDisposable = 0;
+        is3DEN = 1;
+        canSetArea = 1;
+        canSetAreaHeight = 0;
+        canSetAreaShape = 1;
+        icon =  "\a3\Missions_F_Beta\data\img\iconMPTypeDefense_ca.paa";
+        portrait = "\a3\Missions_F_Beta\data\img\portraitMPTypeDefense_ca.paa";
+        class AttributeValues
+        {
+            size3[] = {5,5,-1};
+            isRectangle = 0;
+        };
+        class Attributes: AttributesBase
+        {
+            class GVAR(skipTerrain): Checkbox
+            {
+                property = QGVAR(skipTerrain);
+                displayName = "Skip Terrain";
+                tooltip = "Skip terrain modifications in area";
+                typeName = "BOOL";
+                defaultValue = "false";
+            };
+            class GVAR(segmentSkip): Checkbox
+            {
+                property = QGVAR(segmentSkip);
+                displayName = "Skip Trench Objects";
+                tooltip = "Hide trench segments in area";
+                typeName = "BOOL";
+                defaultValue = "false";
+            };
+            class GVAR(wallSkip): Checkbox
+            {
+                property = QGVAR(wallSkip);
+                displayName = "Skip trench wall";
+                tooltip = "Hide fortifications in area";
+                typeName = "BOOL";
+                defaultValue = "false";
+            };
+            class GVAR(sandbagSkip): Checkbox
+            {
+                property = QGVAR(sandbagSkip);
+                displayName = "Skip Sandbags";
+                tooltip = "Hide sandbags in area";
+                typeName = "BOOL";
+                defaultValue = "true";
+            };
+            class GVAR(barbedWireSkip): Checkbox
+            {
+                property = QGVAR(barbedWireSkip);
+                displayName = "Skip Barbed Wire";
+                tooltip = "Hide barbed wire in area";
+                typeName = "BOOL";
+                defaultValue = "true";
+            };
+            class GVAR(tankTrapSkip): Checkbox
+            {
+                property = QGVAR(tankTrapSkip);
+                displayName = "Skip Tank Traps";
+                tooltip = "Hide tank traps in area";
+                typeName = "BOOL";
+                defaultValue = "true";
+            };
+            class GVAR(additonalHorizSkip): Checkbox
+            {
+                property = QGVAR(additonalHorizSkip);
+                displayName = "Skip Additional Horizontal Segments";
+                tooltip = "Hide additional horizontal segments in area";
+                typeName = "BOOL";
+                defaultValue = "true";
+            };
+    };
     class GVAR(Module_TrenchPiece): Module_F
     {
         author = "Seb";
@@ -70,40 +148,45 @@ class CfgVehicles
         displayName = "Trench Controller";
         icon = "A3\Modules_F_Tacops\Data\CivilianPresence\icon32_ca.paa";
         portrait = "A3\Modules_F_Tacops\Data\CivilianPresence\icon32_ca.paa";
-        class Arguments
+        class Attributes: AttributesBase
         {
-            class TrenchDepth
+            class TrenchDepth: Edit
             {
+                property = "TrenchDepth";
                 displayName = "Depth";
-                description = "Depth of the upper lip of the trench to the bottom";
+                tooltip = "Depth of the upper lip of the trench to the bottom";
                 typeName = "NUMBER";
                 defaultValue = "2";
             };
-            class TrenchWidth
+            class TrenchWidth: Edit
             {
+                property = "TrenchWidth";
                 displayName = "Width";
-                description = "Width of the trench";
+                tooltip = "Width of the trench";
                 typeName = "NUMBER";
                 defaultValue = "4";
             };
-            class BlendEnds
+            class BlendEnds: Checkbox
             {
+                property = "BlendEnds";
                 displayName = "Blend Ends";
-                description = "Blend the ends of the trench into the terrain";
+                tooltip = "Blend the ends of the trench into the terrain";
                 typeName = "BOOL";
                 defaultValue = "true";
             };
-            class TrenchPitch
+            class TrenchPitch: Edit
             {
+                property = "TrenchPitch";
                 displayName = "Pitch";
-                description = "Angle of trench wall";
+                tooltip = "Angle of trench wall";
                 typeName = "NUMBER";
                 defaultValue = "0";
             };
-            class WallType 
+            class WallType: Combo
             {
+                property = "WallType";
                 displayName = "Wall Type";
-                description = "Reinforce the trench wall with one of the folowing";
+                tooltip = "Reinforce the trench wall with one of the folowing";
                 class Values {
                     // Note: values are parsed as strings in game
                     class None {
@@ -139,10 +222,11 @@ class CfgVehicles
                     };
                 };
             };
-            class DoSandbags 
+            class DoSandbags: Combo
             {
+                property = "DoSandbags";
                 displayName = "Sandbags";
-                description = "Add sandbags to lip of trench";
+                tooltip = "Add sandbags to lip of trench";
                 class Values {
                     // Note: values are parsed as strings in game
                     class None {
@@ -162,17 +246,19 @@ class CfgVehicles
                     };
                 };
             };
-            class DoBarbedWire 
+            class DoBarbedWire: Checkbox
             {
+                property = "DoBarbedWire";
                 displayName = "Barbed Wire";
-                description = "Add barbed wire to lip of trench. WARNING: Barbed wire objects are simulated and therefore can cause performance issues";
+                tooltip = "Add barbed wire to lip of trench. WARNING: Barbed wire objects are simulated and therefore can cause performance issues";
                 typeName = "BOOL";
                 defaultValue = "false";
             };
-            class TankTrapType 
+            class TankTrapType: Combo
             {
+                property = "TankTrapType";
                 displayName = "Tank traps";
-                description = "Add tank traps to lip of trench";
+                tooltip = "Add tank traps to lip of trench";
                 class Values {
                     // Note: values are parsed as strings in game
                     class None {
@@ -192,10 +278,11 @@ class CfgVehicles
                     };
                 };
             };
-            class AiBuildingPosition 
+            class AiBuildingPosition: Checkbox
             {
+                property = "AiBuildingPosition";
                 displayName = "AI Building Positions";
-                description = "Add points AI to garrison in  the trench";
+                tooltip = "Add points AI to garrison in  the trench";
                 class Values {
                     class None {
                         default = 1;
@@ -214,31 +301,35 @@ class CfgVehicles
                     };
                 };
             };
-            class AdditionalHorizSegments
+            class AdditionalHorizSegments: Edit
             {
+                property = "AdditionalHorizSegments";
                 displayName = "Extra Horizontal Segments";
-                description = "Extend the trench slope with additional horizontal segments. Good for terrains with large cell sizes";
+                tooltip = "Extend the trench slope with additional horizontal segments. Good for terrains with large cell sizes";
                 typeName = "NUMBER";
                 defaultValue = "0";
             };
-            class SkipTerrain
+            class SkipTerrain: Checkbox
             {
+                property = "SkipTerrain";
                 displayName = "Skip Terrain";
-                description = "Skip generating terrain modifications for the trench.";
+                tooltip = "Skip generating terrain modifications for the trench.";
                 typeName = "BOOL";
                 defaultValue = "false";
             };
-            class SkipObjects
+            class SkipObjects: Checkbox
             {
+                property = "SkipObjects";
                 displayName = "Skip Objects";
-                description = "Skip adding objects to the trench.";
+                tooltip = "Skip adding objects to the trench.";
                 typeName = "BOOL";
                 defaultValue = "false";
             };
-            class SkipHidingObjects
+                
+            class SkipHidingObjects: Checkbox
             {
                 displayName = "Skip Hiding Objects";
-                description = "Skip hiding terrain objects in the trench area.";
+                tooltip = "Skip hiding terrain objects in the trench area.";
                 typeName = "BOOL";
                 defaultValue = "false";
             };
