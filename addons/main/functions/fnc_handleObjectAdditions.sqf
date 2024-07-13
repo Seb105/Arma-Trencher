@@ -1,5 +1,5 @@
 #include "script_component.hpp"
-params ["_nodes", "_controller"];
+params ["_nodes", "_controller", "_pitch"];
 private _wallType = parseNumber (_controller getVariable "WallType"); // Config values are strings
 private _sandBagType = parseNumber (_controller getVariable "DoSandbags");
 private _doBarbedWire = _controller getVariable "DoBarbedWire";
@@ -23,26 +23,22 @@ _nodes apply {
         private _behindTrench = _trenchPiece modelToWorld [0,5,0];
         private _pieceDir = getDir _trenchPiece;
         // Only offset backwards to object, ignore lateral movement
-        private _offsetStep = [[0,0,0], _pieceDir, 0.368] call FUNC(offset);
         private _bottomHeight = getTerrainHeightASL _behindTrench;
         private _height = _topSegmentHeight - _bottomHeight;
-        private _piecePos = getPosASL _trenchPiece;
-        private _numExtraVertical = (ceil (_height / 4.457)) max 0;
+        private _piecePos = getPosWorld _trenchPiece;
+        private _numExtraVertical = (ceil (_height / SEGMENT_HEIGHT)) max 0;
         for "_i" from 1 to _numExtraVertical do {
-            private _relativePos = [0,0.368,-4.457] vectorMultiply _i;
-            private _dirAndUp = [[0,1,0],[0,0,1]] apply {
-                _trenchPiece vectorModelToWorld _x
-            };
+            private _relativeStep = [[0,0.11], -_pieceDir] call BIS_fnc_rotateVector2D;
+            _relativeStep set [2, -SEGMENT_HEIGHT];
+            private _dirAndUp = [vectorDir _trenchPiece, vectorUp _trenchPiece];
             // Only care about Z
-            private _posZ = (_trenchPiece modelToWorldWorld _relativePos)#2;
-            // Use simple backwards offset. This means that the piece will be directly below and behind the previous piece to match its angle
-            private _posASL = _piecePos vectorAdd (_offsetStep vectorMultiply _i);
-            _posASL set [2, _posZ];
+            private _pos = (_relativeStep vectorMultiply _i) vectorAdd _piecePos;
+            // Use simple backwards offset. This means that the piece will be directly below and behind the previous piece to match its angle];
             private _extraVertical = createSimpleObject [_pieceType, [0,0,0]];
-            _extraVertical setPosWorld _posASL;
+            _extraVertical setPosWorld _pos;
             _extraVertical setVectorDirAndUp _dirAndUp;
             _extraVertical enableSimulationGlobal false;
-            _extraVertical setObjectTextureGlobal [0, (surfaceTexture _posASL)];
+            _extraVertical setObjectTextureGlobal [0, (surfaceTexture _pos)];
             _extraVertical setObjectMaterialGlobal [0, SEGMENT_MATERIAL];
             _extraVertical hideSelection ["snow", true];
             _wallPieces pushBack _extraVertical;
@@ -290,7 +286,6 @@ _nodes apply {
                 _trenchPieces pushBack _extraHorizontal;
             };
         };
-
         if (_aiBuildingPositions isNotEqualTo -1) then {
             private _pos = [getPos _trenchPiece, _pieceDir, 2] call FUNC(offset);
             _pos set [2, getTerrainHeightASL _pos];

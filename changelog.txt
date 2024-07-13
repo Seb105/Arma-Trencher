@@ -1,0 +1,5 @@
+1. Reduce size of trenches in misison file by up to 30x
+2. Fix object heights not working in eden correctly
+3. Improve how trench pitch is calculated
+4. Fix blend trench ends not disabling
+5. Other tweaks

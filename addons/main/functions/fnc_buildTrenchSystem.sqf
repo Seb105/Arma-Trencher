@@ -50,7 +50,7 @@ _nodes apply {
 
 private _depth = _controller getVariable "TrenchDepth";
 private _trenchWidth = (_controller getVariable "TrenchWidth") max 0;
-private _pitch = _controller getVariable "TrenchPitch"; // SLope of the trench walls
+private _pitch = (_controller getVariable "TrenchPitch") - 3; // SLope of the trench walls
 private _blendTrenchEnds = _controller getVariable "BlendEnds";
 private _skipTerrain = _controller getVariable "SkipTerrain";
 private _skipObjects = _controller getVariable "SkipObjects";
@@ -58,10 +58,10 @@ private _skipHidingObjects = _controller getVariable "SkipHidingObjects";
 
 private _numHorizontal = 1 + (_controller getVariable "AdditionalHorizSegments");
 private _objectsWidth = SEGMENT_WIDTH * _numHorizontal;
-private _minObjectsWidth = 1.5 * _cellSize * (sqrt 2);
+private _minObjectsWidth = 1 * _cellSize * (sqrt 2);
 if (_objectsWidth < _minObjectsWidth) then {
     private _recommendedExtraObjects = ceil (_minObjectsWidth / SEGMENT_WIDTH) - 1;
-    private _msg = format ["Terrain has large cell size of %1. Recommend setting 'Extra Horizontal Segments' to %2 to avoid gaps at edge of trench", _cellSize, _recommendedExtraObjects];
+    private _msg = format ["Terrain has cell size of %1. Recommend setting 'Extra Horizontal Segments' to %2 or more to avoid gaps at edge of trench", _cellSize, _recommendedExtraObjects];
     // [_msg, 1, 5, true, 0] call BIS_fnc_3DENNotification;
     systemChat _msg;
 };
@@ -82,13 +82,13 @@ if !(_skipHidingObjects) then {
 
 // Handle terrain
 if !(_skipTerrain) then {
-    [_nodes, _trenchWidth, _widthToEdge, _cellSize, _trueDepth] call FUNC(getTerrainPoints);
+    [_nodes, _trenchWidth, _widthToEdge, _cellSize, _trueDepth, _blendTrenchEnds] call FUNC(getTerrainPoints);
     [_nodes, _widthToEdge, _blendTrenchEnds, _trueDepth, _cellSize] call FUNC(handleTerrain);
 };
 
 // Create new objs
 [_nodes] call trencher_main_fnc_handleObjects;
-[_nodes, _controller] call trencher_main_fnc_handleObjectAdditions;
+[_nodes, _controller, _pitch] call trencher_main_fnc_handleObjectAdditions;
 
 // Write to SQM
 call FUNC(writeToSQM);

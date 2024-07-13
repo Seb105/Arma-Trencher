@@ -1,5 +1,5 @@
 #include "script_component.hpp"
-params ["_nodes", "_trenchWidth", "_widthToEdge", "_cellSize", "_trueDepth"];
+params ["_nodes", "_trenchWidth", "_widthToEdge", "_cellSize", "_trueDepth", "_blendTrenchEnds"];
 // private _offset = _cellSize * 1.41421356;
 // POINTS = [];
 // private _lowerWidth = (_trenchWidth/2) + _offset;
@@ -13,7 +13,7 @@ _nodes apply {
     // private _overlapping = ([_startNodePos, _trenchWidth*2, _trenchWidth*2, 0, false, -1] call TerrainLib_fnc_getAreaTerrainGrid) select {_x inPolygon _polygon};
     private _overlapping = [];
     _startNodePos set [2, 0];
-    private _blendEnds = count _connections == 1;
+    private _blendEnds = count _connections == 1 && _blendTrenchEnds;
     _connections apply {
         private _endNode = _x;
         private _endNodePos = getPosASL _endNode;
@@ -22,7 +22,7 @@ _nodes apply {
         // Offset oscillates between 1 and 1.42 * _cellSize every 45 degrees, to account for the hypotenuse of a terrain grid
         private _offset = (1 + (abs(sin(2*_dir)) * 0.41421356)) * _cellSize;
         private _lowerWidth = (_trenchWidth/2) + _offset;
-        private _modifyWidth = (_widthToEdge + _offset) max (_lowerWidth);
+        private _modifyWidth = (_widthToEdge) max (_lowerWidth);
         private _vectorDist = _endNodePos vectorDiff _startNodePos;
         private _center = (_startNodePos vectorAdd _endNodePos) vectorMultiply 0.5;
         private _quarter = (_startNodePos vectorAdd (_vectorDist vectorMultiply 0.25));

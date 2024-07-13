@@ -120,8 +120,16 @@ _nodes apply {
             _ends pushBack [_o2, _o3, _relAngle];
             _lines pushBack [_o3, _o4];
 
-            _polygon append [_o2, _o3];
-            // POLYGONS append [_o2, _o3];
+            private _endDir = _o2 getDir _o3;
+            private _polygonOffset = SEGMENT_WIDTH*_numHorizontal;
+            _polygon append [
+                [_o2, _endDir+90, _polygonOffset] call FUNC(offset), 
+                [_o3, _endDir+90, _polygonOffset] call FUNC(offset)
+            ];
+            // POLYGONS append [
+            //     [_o2, _endDir+90, _polygonOffset] call FUNC(offset), 
+            //     [_o3, _endDir+90, _polygonOffset] call FUNC(offset)
+            // ];
         } forEach _connections;
     };
     // if (count _polygon > 0) then {
