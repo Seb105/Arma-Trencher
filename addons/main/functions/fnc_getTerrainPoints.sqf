@@ -26,7 +26,8 @@ _nodes apply {
         private _dir = _startNodePos getDir _endNodePos;
         // Offset oscillates between 1 and 1.42 * _cellSize every 45 degrees, to account for the hypotenuse of a terrain grid
         private _offset = (1 + (abs(sin(2*_dir)) * 0.41421356)) * _cellSize;
-        private _lowerWidth = (_trenchWidth/2) + _offset;
+        private _lowerWidth = (ceil ((_trenchWidth/2)/_offset)) * _offset + 0.1;
+        // systemChat str [_cellSize, _offset, _trenchWidth/2, _lowerWidth];
         private _modifyWidth = (_widthToEdge) max (_lowerWidth);
         private _vectorDist = _endNodePos vectorDiff _startNodePos;
         private _center = (_startNodePos vectorAdd _endNodePos) vectorMultiply 0.5;
