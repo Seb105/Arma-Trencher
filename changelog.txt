@@ -1,4 +1,4 @@
-v2.2:
+v2.2.1:
 
 Big stuff:
 1. Reduce size of trenches in mission file by up to 30x
