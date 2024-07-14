@@ -1,12 +1,11 @@
-
 v2.2:
 
 Big stuff:
-1. Reduce size of trenches in misison file by up to 30x
+1. Reduce size of trenches in mission file by up to 30x
 2. Add area-based module for hiding certain parts of any trench
 3. Fix object heights not working in eden correctly
 
 Other stuff:
 1. Improve performance when moving many objects
 2. Use checkboxes where possible.
-3. More stuff I have since forgotten about
+3. Various tweaks to trench generation
