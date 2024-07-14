@@ -165,7 +165,7 @@ _nodes apply {
                     [
                         "Land_HBarrierWall6_F",
                         [0,5.497,0.287],
-                        [[0,-1,0],[0,0,1]]
+                        [[0,-0.99863,-0.052336],[0,-0.052336,0.99863]]
                     ]
                 ]
             ];
@@ -206,24 +206,25 @@ _nodes apply {
             [
                 [
                     "Land_BagFence_Long_F",
-                    [2.37,4.053,2.32],
-                    [[0,1,0],[0.06,0,0.998]]
+                    [2.37,4.066,2.32],
+                    [[0,0.999,0.052],[0.06,-0.052,0.997]]
                 ],
                 [
                     "Land_BagFence_Long_F",
-                    [-0.474,4.053,2.419],
-                    [[0,-1,0.007],[0.005,0.007,1]]
+                    [-0.474,4.061,2.419],
+                    [[0,-0.999,-0.046],[0.005,-0.046,0.999]]
                 ],
                 [
                     "Land_BagFence_Long_F",
-                    [-2.917,4.053,2.271],
-                    [[0,1,0],[-0.148,0,0.989]]
+                    [-2.917,4.069,2.272],
+                    [[0,0.999,0.052],[-0.148,-0.052,0.988]]
                 ]
             ] apply {
                 _x params ["_", "_relativePos", "_relativeDirAndUp"];
                 private _posASL = _trenchPiece modelToWorldWorld _relativePos;
                 if !([_posASL, _skippers, QGVAR(sandbagSkip)] call _fnc_shouldPlace) then {continue};
                 private _vectorDirAndUp = _relativeDirAndUp apply {_trenchPiece vectorModelToWorld _x};
+                // private _vectorDirAndUp = [_trenchPiece vectorModelToWorld _relativeDirAndUp#0, [0,0,1]];
                 private _sandbag = createSimpleObject [_sandbagClass, _posASL];
                 _sandbag setPosWorld _posASL;
                 _sandbag setVectorDirAndUp _vectorDirAndUp;
@@ -324,7 +325,7 @@ _nodes apply {
         };
 
         if (_aiBuildingPositions isNotEqualTo -1) then {
-            private _pos = [getPos _trenchPiece, _pieceDir, 2] call FUNC(offset);
+            private _pos = [getPos _trenchPiece, _pieceDir, 2.2] call FUNC(offset);
             _pos set [2, getTerrainHeightASL _pos];
             private _garrison = createVehicle ["CBA_BuildingPos", _pos];
             _garrison setPosASL _pos;
