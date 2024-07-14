@@ -85,15 +85,15 @@ class CfgVehicles
             {
                 property = QGVAR(segmentSkip);
                 displayName = "Skip Trench Objects";
-                tooltip = "Hide trench segments in area";
+                tooltip = "Skip trench segments in area";
                 typeName = "BOOL";
                 defaultValue = "false";
             };
             class GVAR(wallSkip): Checkbox
             {
                 property = QGVAR(wallSkip);
-                displayName = "Skip trench wall";
-                tooltip = "Hide fortifications in area";
+                displayName = "Skip Trench Wall";
+                tooltip = "Skip fortifications in area";
                 typeName = "BOOL";
                 defaultValue = "false";
             };
@@ -101,7 +101,7 @@ class CfgVehicles
             {
                 property = QGVAR(sandbagSkip);
                 displayName = "Skip Sandbags";
-                tooltip = "Hide sandbags in area";
+                tooltip = "Skip sandbags in area";
                 typeName = "BOOL";
                 defaultValue = "true";
             };
@@ -109,7 +109,7 @@ class CfgVehicles
             {
                 property = QGVAR(barbedWireSkip);
                 displayName = "Skip Barbed Wire";
-                tooltip = "Hide barbed wire in area";
+                tooltip = "Skip barbed wire in area";
                 typeName = "BOOL";
                 defaultValue = "true";
             };
@@ -117,7 +117,7 @@ class CfgVehicles
             {
                 property = QGVAR(tankTrapSkip);
                 displayName = "Skip Tank Traps";
-                tooltip = "Hide tank traps in area";
+                tooltip = "Skip tank traps in area";
                 typeName = "BOOL";
                 defaultValue = "true";
             };
@@ -125,7 +125,7 @@ class CfgVehicles
             {
                 property = QGVAR(additonalHorizSkip);
                 displayName = "Skip Additional Horizontal Segments";
-                tooltip = "Hide additional horizontal segments in area";
+                tooltip = "Skip additional horizontal segments in area";
                 typeName = "BOOL";
                 defaultValue = "false";
             };
