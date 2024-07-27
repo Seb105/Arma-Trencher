@@ -318,6 +318,14 @@ class CfgVehicles
                 typeName = "NUMBER";
                 defaultValue = "0";
             };
+            class TransitionLength: Edit
+            {
+                property = "TransitionLength";
+                displayName = "Terrain Transition Length";
+                tooltip = "Distance from the edge of the trench to blend into the natural terrain";
+                typeName = "NUMBER";
+                defaultValue = "0";
+            };
             class SkipTerrain: Checkbox
             {
                 property = "SkipTerrain";

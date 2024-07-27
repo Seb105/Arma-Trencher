@@ -306,11 +306,15 @@ _nodes apply {
 
         if (_extraHorizSegments > 0) then {
             for "_i" from 1 to _extraHorizSegments do {
-                private _relativePos = [0,-SEGMENT_WIDTH,-0.671] vectorMultiply _i;
+                private _relativePosCentre = [0,-SEGMENT_WIDTH,-0.671] vectorMultiply _i;
                 private _dirAndUp = [[0,1,0],[0,0,1]] apply {
                     _trenchPiece vectorModelToWorld _x
                 };
-                private _posASL = _trenchPiece modelToWorldWorld _relativePos;
+                private _posASL = _trenchPiece modelToWorldWorld _relativePosCentre;
+                // private _edgeATL = (ASLtoATL _posASL)#2;
+                // if (_edgeATL < -SEGMENT_SLOPE_TOP) then {
+                //     break;
+                // };
                 if !([_posASL, _skippers, QGVAR(additonalHorizSkip)] call _fnc_shouldPlace) then {continue};
                 private _extraHorizontal = createSimpleObject [_pieceType, [0,0,0]];
                 _extraHorizontal setPosWorld _posASL;

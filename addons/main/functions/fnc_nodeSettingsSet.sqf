@@ -13,6 +13,7 @@ private _names = [
     "TankTrapType",
     "AiBuildingPosition",
     "AdditionalHorizSegments",
+    "TransitionLength",
     "SkipTerrain",
     "SkipObjects",
     "SkipHidingObjects"

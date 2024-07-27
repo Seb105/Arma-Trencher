@@ -1,9 +1,12 @@
 #include "script_component.hpp"
-params ["_nodes", "_trenchWidth", "_widthToEdge", "_cellSize", "_trueDepth", "_blendTrenchEnds"];
-// private _offset = _cellSize * 1.41421356;
-// POINTS = [];
-// private _lowerWidth = (_trenchWidth/2) + _offset;
-// private _modifyWidth = (_widthToEdge) max (_lowerWidth);
+params ["_nodes", "_trenchWidth", "_widthToEdge", "_transitionLength", "_cellSize", "_trueDepth", "_blendTrenchEnds"];
+// private _widthToTerrainEdge = _widthToEdge + _transitionLength;
+// private _modifyWidthBase = _widthToTerrainEdge;
+// private _transitionWidth = _modifyWidth - _widthToEdge;
+private _skipTransition = _transitionLength <= 0;
+// systemChat str _skipTransition;
+P1 = [];
+P2 = [];
 _nodes apply {
     private _startNode = _x;    
     private _skippers = (_startNode getVariable QGVAR(skippers)) select {
@@ -15,7 +18,6 @@ _nodes apply {
     private _terrainPoints = [];
     private _startNodePos = getPosASL _startNode;
     private _polygon = _startNode getVariable QGVAR(polygon);
-    // private _overlapping = ([_startNodePos, _trenchWidth*2, _trenchWidth*2, 0, false, -1] call TerrainLib_fnc_getAreaTerrainGrid) select {_x inPolygon _polygon};
     private _overlapping = [];
     _startNodePos set [2, 0];
     private _blendEnds = count _connections == 1 && _blendTrenchEnds;
@@ -24,18 +26,18 @@ _nodes apply {
         private _endNodePos = getPosASL _endNode;
         _endNodePos set [2, 0];
         private _dir = _startNodePos getDir _endNodePos;
-        // Offset oscillates between 1 and 1.42 * _cellSize every 45 degrees, to account for the hypotenuse of a terrain grid
-        private _offset = (1 + (abs(sin(2*_dir)) * 0.41421356)) * _cellSize;
-        private _lowerWidth = (ceil ((_trenchWidth/2)/_offset)) * _offset + 0.1;
-        // systemChat str [_cellSize, _offset, _trenchWidth/2, _lowerWidth];
-        private _modifyWidth = (_widthToEdge) max (_lowerWidth);
         private _vectorDist = _endNodePos vectorDiff _startNodePos;
         private _center = (_startNodePos vectorAdd _endNodePos) vectorMultiply 0.5;
         private _quarter = (_startNodePos vectorAdd (_vectorDist vectorMultiply 0.25));
         private _fromTo = _startNodePos vectorFromTO _center;
+
+        // Offset oscillates between 1 and 1.42 * _cellSize every 45 degrees, to account for the hypotenuse of a terrain grid
+        private _offset = (1 + (abs(sin(2*_dir)) * 0.415)) * _cellSize;
+        private _lowerWidth = ((ceil ((_trenchWidth)/_offset)) * _offset + _offset)/2;
+        private _flattenWidth = (ceil ((_widthToEdge)/_offset)) * _offset;
+        private _modifyWidth = _flattenWidth + _transitionLength;
         private _length = (_startNodePos distance2D _center) + _offset;
         private _modifyArea = [_quarter, _modifyWidth, _length/2, _dir, true, -1];
-        private _lowerArea = [_quarter, _lowerWidth, _length/2, _dir, true, -1];
         private _newPoints = [_modifyArea] call TerrainLib_fnc_getAreaTerrainGrid;
 
         private _offsetLeft = [[0,0,0], _dir-90, _widthToEdge] call FUNC(offset);
@@ -43,24 +45,45 @@ _nodes apply {
 
         private _blendLength = ((_trueDepth * 4) max (_offset*2)) min (_length*0.75);
         private _selectedPoints = [];
+
         _newPoints apply {
             private _point = _x;
             if (_skippers findIf {_point inArea _x} isNotEqualTo -1) then {continue};
-            private _sub = [0, _trueDepth] select (_point inArea _lowerArea);
             // This extracts the width along the trench of the point, ignoring the length component
             private _dirToStart = (_startNodePos getDir _point) - _dir;
             private _distToCenter  = _point distance2D _startNodePos;
 
             private _xCompontent = _distToCenter * cos _dirToStart;
+            private _yComponent = abs (_distToCenter * sin _dirToStart);
             private _centreLine = _startNodePos vectorAdd (_fromTo vectorMultiply _xCompontent);
-            private _height = selectMin [
+            private _lowestEdge = selectMin [
                 getTerrainHeightASL (_centreLine vectorAdd _offsetLeft),
                 getTerrainHeightASL (_centreLine vectorAdd _offsetRight)
             ];
             // private _yComponent = _distToCenter * sin _dirToStart;
-            private _newHeight = _height - _sub;
+            private _currentHeight = _point#2;
+            private _newHeight = _currentHeight;
+            if (_yComponent <= _lowerWidth) then {
+                // P1 pushBack _point;
+                _newHeight = _lowestEdge - _trueDepth;
+            };
+            if (_yComponent > _lowerWidth && _yComponent <= _flattenWidth) then {
+                // P2 pushBack _point;
+                _newHeight = _lowestEdge;
+            };
+            if (_yComponent > _flattenWidth && _currentHeight > _lowestEdge) then {
+                // P2 pushBack _point;
+                private _distToEdge = _yComponent - _widthToEdge;
+                private _blend = (1 min _distToEdge / _transitionLength) max 0;
+                _newHeight = _currentHeight * _blend + _lowestEdge * (1 - _blend);
+            };
+
+            if (_newHeight isEqualTo _currentHeight) then {
+                continue;
+            };
+            P1 pushBack _point;
+            // Blend trench ends
             if (_xCompontent < _blendLength && _blendEnds) then {
-                private _currentHeight = _point select 2;
                 private _blend = (1 min _xCompontent / _blendLength) max 0;
                 _newHeight = _newHeight * _blend + _currentHeight * (1 - _blend);
             };
@@ -81,11 +104,6 @@ _nodes apply {
         _overlapping = _overlapping - _matching;
         private _matchingCount = count _matching;
         if (_matchingCount > 1) then {
-            // private _matchingZ = 0;
-            // {
-            //     _matchingZ = _x#2 + _matchingZ;
-            // } forEach _matching;
-            // _matchingZ = _matchingZ / _matchingCount;
             private _matchingZ = selectMin (_matching apply {_x#2});
             _point set [2, _matchingZ];
         };

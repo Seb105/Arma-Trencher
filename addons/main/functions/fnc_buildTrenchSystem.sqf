@@ -56,12 +56,13 @@ _nodes apply {
 
 
 private _depth = _controller getVariable "TrenchDepth";
-private _trenchWidth = (_controller getVariable "TrenchWidth") max 0;
+private _trenchWidth = ((_controller getVariable "TrenchWidth") max 0) + 0.7;
 private _pitch = (_controller getVariable "TrenchPitch") - 3; // SLope of the trench walls
 private _blendTrenchEnds = _controller getVariable "BlendEnds";
 private _skipTerrain = _controller getVariable "SkipTerrain";
 private _skipObjects = _controller getVariable "SkipObjects";
 private _skipHidingObjects = _controller getVariable "SkipHidingObjects";
+private _transitionLength = _controller getVariable "TransitionLength";
 
 private _numHorizontal = 1 + (_controller getVariable "AdditionalHorizSegments");
 private _objectsWidth = SEGMENT_WIDTH * _numHorizontal;
@@ -76,7 +77,7 @@ if (_objectsWidth < _minObjectsWidth) then {
 
 // Get new objs to place
 // private _widthToObj = (SEGMENT_WIDTH + _trenchWidth)/2;
-private _widthToEdge = _trenchWidth/2 + (9-SEGMENT_WIDTH) + _objectsWidth;
+private _widthToEdge = _trenchWidth/2 + _objectsWidth;
 private _trueDepth = 0 max (_depth - SEGMENT_FALL);
 if !(_skipObjects) then {
     [_nodes, _trenchWidth, _widthToEdge, _numHorizontal] call FUNC(getTrenchLines);
@@ -89,7 +90,7 @@ if !(_skipHidingObjects) then {
 
 // Handle terrain
 if !(_skipTerrain) then {
-    [_nodes, _trenchWidth, _widthToEdge, _cellSize, _trueDepth, _blendTrenchEnds] call FUNC(getTerrainPoints);
+    [_nodes, _trenchWidth, _widthToEdge, _transitionLength, _cellSize, _trueDepth, _blendTrenchEnds] call FUNC(getTerrainPoints);
     [_nodes, _widthToEdge, _blendTrenchEnds, _trueDepth, _cellSize] call FUNC(handleTerrain);
 };
 
