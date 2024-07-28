@@ -29,7 +29,7 @@ params ["_nodes"];
         []
     ];
     private _originalHeights = _points apply {[_x] call TerrainLib_fnc_unmodifiedTerrainHeight};
-    [_originalHeights, false, true] call TerrainLib_fnc_setTerrainHeight;
+    [_originalHeights, true, true] call TerrainLib_fnc_setTerrainHeight;
 
     {
         _x hideObjectGlobal false;

@@ -1,12 +1,5 @@
 #include "script_component.hpp"
 params ["_nodes", "_trenchWidth", "_widthToEdge", "_transitionLength", "_cellSize", "_trueDepth", "_blendTrenchEnds"];
-// private _widthToTerrainEdge = _widthToEdge + _transitionLength;
-// private _modifyWidthBase = _widthToTerrainEdge;
-// private _transitionWidth = _modifyWidth - _widthToEdge;
-private _skipTransition = _transitionLength <= 0;
-// systemChat str _skipTransition;
-P1 = [];
-P2 = [];
 _nodes apply {
     private _startNode = _x;    
     private _skippers = (_startNode getVariable QGVAR(skippers)) select {
@@ -63,14 +56,17 @@ _nodes apply {
             // private _yComponent = _distToCenter * sin _dirToStart;
             private _currentHeight = _point#2;
             private _newHeight = _currentHeight;
+            // If the point is within the trench width, set the height to the trench depth
             if (_yComponent <= _lowerWidth) then {
                 // P1 pushBack _point;
                 _newHeight = _lowestEdge - _trueDepth;
             };
+            // If the point in between the inner and outer lip of trench objects, flatten to the lowest edge
             if (_yComponent > _lowerWidth && _yComponent <= _flattenWidth) then {
                 // P2 pushBack _point;
                 _newHeight = _lowestEdge;
             };
+            // If the point is outside the trench width, blend to the lowest edge. Ignore if the lowest edge is higher than the current height.
             if (_yComponent > _flattenWidth && _currentHeight > _lowestEdge) then {
                 // P2 pushBack _point;
                 private _distToEdge = _yComponent - _widthToEdge;
@@ -81,7 +77,7 @@ _nodes apply {
             if (_newHeight isEqualTo _currentHeight) then {
                 continue;
             };
-            P1 pushBack _point;
+
             // Blend trench ends
             if (_xCompontent < _blendLength && _blendEnds) then {
                 private _blend = (1 min _xCompontent / _blendLength) max 0;

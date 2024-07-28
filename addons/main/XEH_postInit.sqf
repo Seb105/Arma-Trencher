@@ -15,7 +15,7 @@ private _fnc_getMissionConfigValue = {
 if (isServer) then {
     private _terrainPoints = QGVAR(terrainPoints) call _fnc_getMissionConfigValue;
     // Don't use terrainLib, so that it cannot be accidentally restored.
-    setTerrainHeight [_terrainPoints, false];
+    setTerrainHeight [_terrainPoints, true];
 
     private _simulatedObjects = QGVAR(simulatedObjects) call _fnc_getMissionConfigValue;
     _simulatedObjects apply {

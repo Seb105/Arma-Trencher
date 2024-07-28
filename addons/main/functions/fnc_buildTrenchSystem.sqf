@@ -11,10 +11,6 @@ if (count _controllers > 1) exitWith {
     ["A trench can only have 1 controller module synced", 1, 5, true, 0.5] call BIS_fnc_3DENNotification;
     [_allNodes] call trencher_main_fnc_cleanUpNodes;
 };
-if (count _controllers == 0) exitWith {
-    ["A trench must have a controller module synced", 1, 5, true, 0] call BIS_fnc_3DENNotification;
-    [_allNodes] call trencher_main_fnc_cleanUpNodes;
-};
 if (count _allNodes < 2) exitWith {
     [_allNodes] call trencher_main_fnc_cleanUpNodes;
 };
@@ -85,7 +81,7 @@ if !(_skipObjects) then {
 };
 // Get objs to hide
 if !(_skipHidingObjects) then {
-    [_nodes, _widthToEdge] call FUNC(getObjsToHide)
+    [_nodes, _trenchWidth + SEGMENT_WIDTH] call FUNC(getObjsToHide)
 };
 
 // Handle terrain
