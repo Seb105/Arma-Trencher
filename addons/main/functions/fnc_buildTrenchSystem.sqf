@@ -32,7 +32,7 @@ if (_thisSegmentOnly) then {
         count (_nodes arrayIntersect _x) > 0;
     };
 };
-// systemChat str [count _nodes, count _pairs];
+systemChat str [count _nodes, count _pairs];
 // Don't update objects that have already been updated this frame
 private _frame = diag_frameNo; 
 _nodes = _nodes select {
@@ -62,26 +62,26 @@ private _transitionLength = _controller getVariable "TransitionLength";
 
 private _numHorizontal = 1 + (_controller getVariable "AdditionalHorizSegments");
 private _objectsWidth = SEGMENT_WIDTH * _numHorizontal;
-private _minObjectsWidth = 1 * _cellSize * (sqrt 2);
-if (_objectsWidth < _minObjectsWidth) then {
-    private _recommendedExtraObjects = ceil (_minObjectsWidth / SEGMENT_WIDTH) - 1;
-    private _msg = format ["Terrain has cell size of %1. Recommend setting 'Extra Horizontal Segments' to %2 or more to avoid gaps at edge of trench", _cellSize, _recommendedExtraObjects];
-    // [_msg, 1, 5, true, 0] call BIS_fnc_3DENNotification;
-    systemChat _msg;
-};
+// private _minObjectsWidth = 1 * _cellSize * (sqrt 2);
+// if (_objectsWidth < _minObjectsWidth) then {
+//     private _recommendedExtraObjects = ceil (_minObjectsWidth / SEGMENT_WIDTH) - 1;
+//     private _msg = format ["Terrain has cell size of %1. Recommend setting 'Extra Horizontal Segments' to %2 or more to avoid gaps at edge of trench", _cellSize, _recommendedExtraObjects];
+//     // [_msg, 1, 5, true, 0] call BIS_fnc_3DENNotification;
+//     systemChat _msg;
+// };
 
 
 // Get new objs to place
 // private _widthToObj = (SEGMENT_WIDTH + _trenchWidth)/2;
 private _widthToEdge = _trenchWidth/2 + _objectsWidth;
-private _trueDepth = 0 max (_depth - SEGMENT_FALL);
+private _trueDepth = 0 max (_depth - SEGMENT_FALL * _numHorizontal);
 if !(_skipObjects) then {
     [_nodes, _trenchWidth, _widthToEdge, _numHorizontal] call FUNC(getTrenchLines);
     [_nodes, _pitch, _trenchWidth, _widthToEdge, _numHorizontal] call FUNC(getTrenchObjects);
 };
 // Get objs to hide
 if !(_skipHidingObjects) then {
-    [_nodes, _trenchWidth + SEGMENT_WIDTH] call FUNC(getObjsToHide)
+    [_nodes, _trenchWidth/2 + SEGMENT_WIDTH] call FUNC(getObjsToHide)
 };
 
 // Handle terrain

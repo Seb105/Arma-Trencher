@@ -7,6 +7,15 @@
     [_type, "init", {_this call FUNC(registerEntity)}, true, []] call CBA_fnc_addClassEventHandler;
 };
 
+[QGVAR(Module_TrenchController), "init", {
+    params ["_obj"];
+    private _cellSize = (getTerrainInfo)#2;
+    private _minObjectsWidth = 1 * _cellSize * (sqrt 2);
+    private _recommendedExtraObjects = ceil (_minObjectsWidth / SEGMENT_WIDTH) - 1;
+    // systemChat str _recommendedExtraObjects;
+    _obj set3DENAttribute ["AdditionalHorizSegments", _recommendedExtraObjects]
+}, false, []] call CBA_fnc_addClassEventHandler;
+
 private _allTrenchNetworks = call FUNC(allTrenchNetworks);
 {
     private _origin = _x#0;

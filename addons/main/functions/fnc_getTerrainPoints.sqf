@@ -25,9 +25,10 @@ _nodes apply {
         private _fromTo = _startNodePos vectorFromTO _center;
 
         // Offset oscillates between 1 and 1.42 * _cellSize every 45 degrees, to account for the hypotenuse of a terrain grid
-        private _offset = (1 + (abs(sin(2*_dir)) * 0.415)) * _cellSize;
-        private _lowerWidth = ((ceil ((_trenchWidth)/_offset)) * _offset + _offset)/2;
-        private _flattenWidth = (ceil ((_widthToEdge)/_offset)) * _offset;
+        private _offset = (1 + abs(sin(2*_dir)) * 0.42) * _cellSize;
+        private _lowerWidth = (ceil (_trenchWidth/_offset) * _offset + _offset)/2;
+        _lowerWidth = _lowerWidth max 1.5*_offset;
+        private _flattenWidth = (ceil (_widthToEdge/_offset) * _offset) max _lowerWidth;
         private _modifyWidth = _flattenWidth + _transitionLength;
         private _length = (_startNodePos distance2D _center) + _offset;
         private _modifyArea = [_quarter, _modifyWidth, _length/2, _dir, true, -1];
