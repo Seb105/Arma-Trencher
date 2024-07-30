@@ -1,5 +1,7 @@
 #include "script_component.hpp"
 params ["_nodes", "_trenchWidth", "_widthToEdge", "_transitionLength", "_cellSize", "_trueDepth", "_blendTrenchEnds"];
+LINES1 = [];
+LINES2 = [];
 _nodes apply {
     private _startNode = _x;    
     private _skippers = (_startNode getVariable QGVAR(skippers)) select {
@@ -10,8 +12,8 @@ _nodes apply {
     private _connections = _startNode getVariable QGVAR(connections);
     private _terrainPoints = [];
     private _startNodePos = getPosASL _startNode;
-    private _polygon = _startNode getVariable QGVAR(polygon);
-    private _overlapping = [];
+    private _polygonInner = _startNode getVariable QGVAR(polygonInner);
+    private _polygonOuter = _startNode getVariable QGVAR(polygonOuter);
     _startNodePos set [2, 0];
     private _blendEnds = count _connections == 1 && _blendTrenchEnds;
     _connections apply {
@@ -41,7 +43,10 @@ _nodes apply {
         private _selectedPoints = [];
 
         _newPoints apply {
-            private _point = _x;
+            private _point = _x; 
+            if (_point inPolygon _polygonOuter) then {
+                continue;
+            };
             if (_skippers findIf {_point inArea _x} isNotEqualTo -1) then {continue};
             // This extracts the width along the trench of the point, ignoring the length component
             private _dirToStart = (_startNodePos getDir _point) - _dir;
@@ -86,14 +91,18 @@ _nodes apply {
             };
 
             _point set [2, _newHeight];
-            if (_x inPolygon _polygon) then {
-                _overlapping pushBack _point;
-            } else {
-                _selectedPoints pushBack _point;
-            };
+            _selectedPoints pushBack _point;
+            // if (_x inPolygon _polygon) then {
+            //     _overlapping pushBack _point;
+            // } else {
+            //     _selectedPoints pushBack _point;
+            // };
         };
         _terrainPoints append _selectedPoints;
     };
+
+
+    /*
     while {count _overlapping > 0} do {
         private _point = _overlapping#0;
         private _matching = _overlapping select {_x#0 isEqualTo _point#0 && {_x#1 isEqualTo _point#1}};
@@ -106,5 +115,37 @@ _nodes apply {
         };
         _terrainPoints pushBack _point;
     };
+    */
+
+    if (count _connections > 1) then {
+        LINES1 append _polygonInner;
+        LINES2 append _polygonOuter;
+        private _polygonX = _polygonOuter apply {_x#0};
+        private _polygonY = _polygonOuter apply {_x#1};
+        private _polygonMinX = selectMin _polygonX;
+        private _polygonMaxX = selectMax _polygonX;
+        private _polygonMinY = selectMin _polygonY;
+        private _polygonMaxY = selectMax _polygonY;
+
+        private _polygonMinZ = selectMin (_polygonOuter apply {_x#2});
+
+        private _polygonRangeX = _polygonMaxX - _polygonMinX;
+        private _polygonRangeY = _polygonMaxY - _polygonMinY;
+        private _polygonCentre = [_polygonMinX + _polygonRangeX/2, _polygonMinY + _polygonRangeY/2, 0];
+        private _polygonArea = [_polygonCentre, _polygonRangeX/2, _polygonRangeY/2, 0, true, -1];
+        // systemChat str _polygonCentre;
+        private _polygonPoints = ([_polygonArea] call TerrainLib_fnc_getAreaTerrainGrid) select {_x inPolygon _polygonOuter};
+        _polygonPoints apply {
+            private _point = _x;
+            if (_point inPolygon _polygonInner) then {
+                _x set [2, _polygonMinZ - _trueDepth];;
+            } else {
+                _x set [2, _polygonMinZ]
+            };
+        };
+        _terrainPoints append _polygonPoints;
+        // _terrainPoints = _polygonPoints;
+    };
+
     _startNode setVariable [QGVAR(terrainPoints), _terrainPoints];
 };

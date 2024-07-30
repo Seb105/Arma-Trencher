@@ -32,7 +32,7 @@ if (_thisSegmentOnly) then {
         count (_nodes arrayIntersect _x) > 0;
     };
 };
-systemChat str [count _nodes, count _pairs];
+// systemChat str [count _nodes, count _pairs];
 // Don't update objects that have already been updated this frame
 private _frame = diag_frameNo; 
 _nodes = _nodes select {
@@ -76,7 +76,7 @@ private _objectsWidth = SEGMENT_WIDTH * _numHorizontal;
 private _widthToEdge = _trenchWidth/2 + _objectsWidth;
 private _trueDepth = 0 max (_depth - SEGMENT_FALL * _numHorizontal);
 if !(_skipObjects) then {
-    [_nodes, _trenchWidth, _widthToEdge, _numHorizontal] call FUNC(getTrenchLines);
+    [_nodes, _trenchWidth, _widthToEdge, _numHorizontal, _cellSize] call FUNC(getTrenchLines);
     [_nodes, _pitch, _trenchWidth, _widthToEdge, _numHorizontal] call FUNC(getTrenchObjects);
 };
 // Get objs to hide

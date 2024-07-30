@@ -16,6 +16,7 @@ _nodes apply {
         _x params ["_posASL", "_vectorDirAndUp", ["_long", false]];
         private _class = ["Peer_Trench_Straight_Short_Chameleon", "Peer_Trench_Straight_Long_Chameleon"] select _long;
         private _trenchPiece = createSimpleObject [_class, _posASL];
+        _posASL = _posASL vectorAdd [0, 0, 1];
         _trenchPiece setPosASL _posASL;
         // _posASL set [2, true];
         _trenchPiece setObjectTextureGlobal [0, (surfaceTexture _posASL)];

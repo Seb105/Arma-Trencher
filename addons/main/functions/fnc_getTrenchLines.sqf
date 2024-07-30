@@ -1,10 +1,12 @@
 #include "script_component.hpp"
-params ["_nodes", "_trenchWidth", "_widthToEdge", "_numHorizontal"];
+params ["_nodes", "_trenchWidth", "_widthToEdge", "_numHorizontal", "_cellSize"];
 // POLYGONS = [];
+private _objectsWidth = SEGMENT_WIDTH * _numHorizontal;
 _nodes apply {
     private _lines = [];
     private _ends  = [];
-    private _polygon = [];
+    private _polygonInner = [];
+    private _polygonOuter = [];
     private _node = _x;
     private _nodePos = getPosASL _node;
     // systemChat str _node;
@@ -74,11 +76,12 @@ _nodes apply {
             private _tangent = tan (90 - _relAngle/2);
             private _sub = (_trenchWidth/2)  * _tangent;
             private _angleC = _relAngle;
-            private _lengthC = SEGMENT_LENGTH * _numHorizontal;
+            private _lengthC = _objectsWidth;
             private _angleA = (180 - _relAngle)/2;
             private _lengthA = ((_lengthC/sin _angleC) * sin _angleA) + 0.1;
+            private _totalSub = _sub + _lengthA;
             private _distances = [_start distance2d _nodePos, _nodePos distance2d _end] apply {
-                _x - _sub - _lengthA
+                _x - _totalSub
             };
             _distances params ["_d1", "_d2"];
             // Intersection has overlapped
@@ -121,11 +124,22 @@ _nodes apply {
             _lines pushBack [_o3, _o4];
 
             private _endDir = _o2 getDir _o3;
-            private _polygonOffset = SEGMENT_WIDTH*_numHorizontal;
-            _polygon append [
-                [_o2, _endDir+90, _polygonOffset] call FUNC(offset), 
-                [_o3, _endDir+90, _polygonOffset] call FUNC(offset)
+            private _offset = _cellSize * 1.42;
+            private _polygonOffset = (ceil (_widthToEdge - _totalSub)/_offset) * _offset;
+            private _inner = [
+                [_o2, _a1-180, _polygonOffset] call FUNC(offset),
+                _o2,
+                _o3,
+                [_o3, _a2, _polygonOffset] call FUNC(offset)
             ];
+            _polygonInner append _inner;
+            private _outer = [
+                [_inner#0, _a1+90, _objectsWidth] call FUNC(offset),
+                [_inner#1, _endDir+90, _objectsWidth] call FUNC(offset),
+                [_inner#2, _endDir+90, _objectsWidth] call FUNC(offset),
+                [_inner#3, _a2+90, _objectsWidth] call FUNC(offset)
+            ];
+            _polygonOuter append _outer;
             // POLYGONS append [
             //     [_o2, _endDir+90, _polygonOffset] call FUNC(offset), 
             //     [_o3, _endDir+90, _polygonOffset] call FUNC(offset)
@@ -149,7 +163,8 @@ _nodes apply {
     //     _p2 set [2, _lowestZ];
     // };
 
-    _node setVariable [QGVAR(polygon), _polygon];
+    _node setVariable [QGVAR(polygonInner), _polygonInner];
+    _node setVariable [QGVAR(polygonOuter), _polygonOuter];
     _node setVariable [QGVAR(lines), _lines];
     _node setVariable [QGVAR(ends), _ends];
 };
