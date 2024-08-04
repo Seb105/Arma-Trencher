@@ -1,11 +1,8 @@
-v2.2.1:
+v2.3:
 
-Big stuff:
-1. Reduce size of trenches in mission file by up to 30x
-2. Add area-based module for hiding certain parts of any trench
-3. Fix object heights not working in eden correctly
+Added:
+"Transition length" parameter - blends the terrain outside of the trench with the edge of the trench.
 
-Other stuff:
-1. Improve performance when moving many objects
-2. Use checkboxes where possible.
-3. Various tweaks to trench generation
+Improved:
+Blend between trench segments on steep terrain better
+Cull objects which do not need to be created

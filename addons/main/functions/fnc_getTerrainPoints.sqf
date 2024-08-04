@@ -28,15 +28,16 @@ _nodes apply {
         private _offset = (1 + abs(sin(2*_dir)) * 0.42) * _cellSize;
         private _lowerWidth = (ceil (_trenchWidth/_offset) * _offset + _offset)/2;
         // _lowerWidth = _lowerWidth max 1.5*_offset;
-        private _flattenWidth = _widthToEdge max _lowerWidth;//(ceil (_widthToEdge/_offset) * _offset) max _lowerWidth;
+        private _flattenWidth = (ceil (_widthToEdge/_offset) * _offset) max _lowerWidth;
         private _modifyWidth = _flattenWidth + _transitionLength;
+        private _areaWidth = _modifyWidth;
         private _areaCenter = +_center;
         // if !(_single) then {
             _areaCenter = [_areaCenter, _dir + 90, _modifyWidth/2] call FUNC(offset);
-            _modifyWidth = _modifyWidth/2;
+            _areaWidth = _areaWidth/2;
         // };
         private _length = (_startPos distance2D _center);
-        private _modifyArea = [_areaCenter, _modifyWidth + _cellSize/2, _length + _cellSize/2, _dir, true, -1];
+        private _modifyArea = [_areaCenter, _areaWidth + _cellSize/2, _length + _cellSize/2, _dir, true, -1];
         
         // private _marker = createMarker [str (_modifyArea#0), _modifyArea#0];
         // _marker setMarkerShape "RECTANGLE";
@@ -81,12 +82,13 @@ _nodes apply {
                 // P2 pushBack _point;
                 _newHeight = _lowestEdge;
             };
-            // If the point is outside the trench width, blend to the lowest edge. Ignore if the lowest edge is higher than the current height.
+            // If the point is outside the trench width but within blend width blend to the lowest edge. Ignore if the lowest edge is higher than the current height.
             if (_transitionLength > 0 && _yComponent > _flattenWidth && _currentHeight > _lowestEdge) then {
+                private _transitionHeight = getTerrainHeightASL ([_centreLine, _dir+90, _modifyWidth] call FUNC(offset));
                 // P2 pushBack _point;
                 private _distToEdge = _yComponent - _widthToEdge;
                 private _blend = (1 min _distToEdge / _transitionLength) max 0;
-                _newHeight = _currentHeight * _blend + _lowestEdge * (1 - _blend);
+                _newHeight = _transitionHeight * _blend + _lowestEdge * (1 - _blend);
             };
 
             if (_newHeight isEqualTo _currentHeight) then {

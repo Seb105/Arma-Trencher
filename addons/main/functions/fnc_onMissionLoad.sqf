@@ -13,7 +13,10 @@
     private _minObjectsWidth = 1 * _cellSize * (sqrt 2);
     private _recommendedExtraObjects = ceil (_minObjectsWidth / SEGMENT_WIDTH) - 1;
     // systemChat str _recommendedExtraObjects;
-    _obj set3DENAttribute ["AdditionalHorizSegments", _recommendedExtraObjects]
+    _obj set3DENAttribute ["AdditionalHorizSegments", _recommendedExtraObjects];
+
+    private _recommendedTransitionLength = ceil (2 * _cellSize);
+    _obj set3DENAttribute ["TransitionLength", _recommendedTransitionLength];
 }, false, []] call CBA_fnc_addClassEventHandler;
 
 private _allTrenchNetworks = call FUNC(allTrenchNetworks);
