@@ -21,8 +21,8 @@ _nodes apply {
         private _pieceDir = _dir - 90;
         private _trueStart = [_start, _dir, SEGMENT_LENGTH_HALF] call FUNC(offset);
         private _trueEnd = [_end, _dir+180, SEGMENT_LENGTH_HALF] call FUNC(offset);
-        private _objCentreStart = [_trueStart, _dir+90, SEGMENT_WIDTH_HALF] call FUNC(offset);
-        private _objCentreEnd = [_trueEnd, _dir+90, SEGMENT_WIDTH_HALF] call FUNC(offset);
+        private _objCentreStart = [_trueStart, _dir+90, SEGMENT_WIDTH_HALF + _trenchWidth/2] call FUNC(offset);
+        private _objCentreEnd = [_trueEnd, _dir+90, SEGMENT_WIDTH_HALF + _trenchWidth/2] call FUNC(offset);
         // SWEEPS pushBack [_start, _end];
         // Get 3d distance so we can get extra objects on steeps slopes.
         // private _start3D = _start vectorAdd [0,0,getTerrainHeightASL _start];

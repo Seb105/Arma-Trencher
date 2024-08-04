@@ -3,39 +3,48 @@ params ["_nodes", "_trenchWidth", "_widthToEdge", "_transitionLength", "_cellSiz
 LINES1 = [];
 LINES2 = [];
 _nodes apply {
-    private _startNode = _x;    
-    private _skippers = (_startNode getVariable QGVAR(skippers)) select {
+    private _node = _x;    
+    private _skippers = (_node getVariable QGVAR(skippers)) select {
         _x getVariable QGVAR(skipTerrain)
     } apply {
         _x getVariable QGVAR(area)
     };
-    private _connections = _startNode getVariable QGVAR(connections);
+    private _connections = _node getVariable QGVAR(connections);
     private _terrainPoints = [];
-    private _startNodePos = getPosASL _startNode;
-    private _polygonInner = _startNode getVariable QGVAR(polygonInner);
-    private _polygonOuter = _startNode getVariable QGVAR(polygonOuter);
-    _startNodePos set [2, 0];
-    private _blendEnds = count _connections == 1 && _blendTrenchEnds;
-    _connections apply {
-        private _endNode = _x;
-        private _endNodePos = getPosASL _endNode;
-        _endNodePos set [2, 0];
-        private _dir = _startNodePos getDir _endNodePos;
-        private _vectorDist = _endNodePos vectorDiff _startNodePos;
-        private _center = (_startNodePos vectorAdd _endNodePos) vectorMultiply 0.5;
-        private _quarter = (_startNodePos vectorAdd (_vectorDist vectorMultiply 0.25));
-        private _fromTo = _startNodePos vectorFromTO _center;
+    private _polygonInner = _node getVariable QGVAR(polygonInner);
+    private _polygonOuter = _node getVariable QGVAR(polygonOuter);
+    private _singleConnection = count _connections == 1;
+    private _blendEnds = _singleConnection && _blendTrenchEnds;
+    private _lines = _node getVariable QGVAR(lines);
+    _lines apply {
+        _x params ["_startPos", "_endPos", "_reversed"];
+        private _dir = _startPos getDir _endPos;
+        // private _vectorDist = _endPos vectorDiff _startPos;
+        private _center = (_startPos vectorAdd _endPos) vectorMultiply 0.5;
+        // private _quarter = (_startPos vectorAdd (_vectorDist vectorMultiply 0.25));
+        private _fromTo = _startPos vectorFromTo _center;
 
         // Offset oscillates between 1 and 1.42 * _cellSize every 45 degrees, to account for the hypotenuse of a terrain grid
         private _offset = (1 + abs(sin(2*_dir)) * 0.42) * _cellSize;
         private _lowerWidth = (ceil (_trenchWidth/_offset) * _offset + _offset)/2;
-        _lowerWidth = _lowerWidth max 1.5*_offset;
-        private _flattenWidth = (ceil (_widthToEdge/_offset) * _offset) max _lowerWidth;
+        // _lowerWidth = _lowerWidth max 1.5*_offset;
+        private _flattenWidth = _widthToEdge max _lowerWidth;//(ceil (_widthToEdge/_offset) * _offset) max _lowerWidth;
         private _modifyWidth = _flattenWidth + _transitionLength;
-        private _length = (_startNodePos distance2D _center) + _offset;
-        private _modifyArea = [_quarter, _modifyWidth, _length/2, _dir, true, -1];
-        private _newPoints = [_modifyArea] call TerrainLib_fnc_getAreaTerrainGrid;
+        private _areaCenter = +_center;
+        // if !(_single) then {
+            _areaCenter = [_areaCenter, _dir + 90, _modifyWidth/2] call FUNC(offset);
+            _modifyWidth = _modifyWidth/2;
+        // };
+        private _length = (_startPos distance2D _center);
+        private _modifyArea = [_areaCenter, _modifyWidth + _cellSize/2, _length + _cellSize/2, _dir, true, -1];
+        
+        // private _marker = createMarker [str (_modifyArea#0), _modifyArea#0];
+        // _marker setMarkerShape "RECTANGLE";
+        // _marker setMarkerSize [_modifyArea#1, _modifyArea#2];
+        // _marker setMarkerDir _modifyArea#3;
+        // _marker setMarkerBrush "SolidBorder";
 
+        private _newPoints = [_modifyArea] call TerrainLib_fnc_getAreaTerrainGrid;
         private _offsetLeft = [[0,0,0], _dir-90, _widthToEdge] call FUNC(offset);
         private _offsetRight = [[0,0,0], _dir+90, _widthToEdge] call FUNC(offset);
 
@@ -49,12 +58,12 @@ _nodes apply {
             };
             if (_skippers findIf {_point inArea _x} isNotEqualTo -1) then {continue};
             // This extracts the width along the trench of the point, ignoring the length component
-            private _dirToStart = (_startNodePos getDir _point) - _dir;
-            private _distToCenter  = _point distance2D _startNodePos;
+            private _dirToStart = (_startPos getDir _point) - _dir;
+            private _distToCenter  = _point distance2D _startPos;
 
-            private _xCompontent = _distToCenter * cos _dirToStart;
-            private _yComponent = abs (_distToCenter * sin _dirToStart);
-            private _centreLine = _startNodePos vectorAdd (_fromTo vectorMultiply _xCompontent);
+            private _xComponent = _distToCenter * cos _dirToStart;
+            private _yComponent =  abs _distToCenter * sin _dirToStart;
+            private _centreLine = _startPos vectorAdd (_fromTo vectorMultiply _xComponent);
             private _lowestEdge = selectMin [
                 getTerrainHeightASL (_centreLine vectorAdd _offsetLeft),
                 getTerrainHeightASL (_centreLine vectorAdd _offsetRight)
@@ -73,7 +82,7 @@ _nodes apply {
                 _newHeight = _lowestEdge;
             };
             // If the point is outside the trench width, blend to the lowest edge. Ignore if the lowest edge is higher than the current height.
-            if (_yComponent > _flattenWidth && _currentHeight > _lowestEdge) then {
+            if (_transitionLength > 0 && _yComponent > _flattenWidth && _currentHeight > _lowestEdge) then {
                 // P2 pushBack _point;
                 private _distToEdge = _yComponent - _widthToEdge;
                 private _blend = (1 min _distToEdge / _transitionLength) max 0;
@@ -85,67 +94,57 @@ _nodes apply {
             };
 
             // Blend trench ends
-            if (_xCompontent < _blendLength && _blendEnds) then {
-                private _blend = (1 min _xCompontent / _blendLength) max 0;
+            if (_blendEnds) then {
+                private _distFromEntrance = if (_reversed) then {
+                    _length*2 - _xComponent
+                } else {
+                    _xComponent
+                };
+                private _blend = (1 min _distFromEntrance / _blendLength) max 0;
                 _newHeight = _newHeight * _blend + _currentHeight * (1 - _blend);
             };
 
             _point set [2, _newHeight];
             _selectedPoints pushBack _point;
-            // if (_x inPolygon _polygon) then {
-            //     _overlapping pushBack _point;
-            // } else {
-            //     _selectedPoints pushBack _point;
-            // };
         };
         _terrainPoints append _selectedPoints;
     };
 
-
-    /*
-    while {count _overlapping > 0} do {
-        private _point = _overlapping#0;
-        private _matching = _overlapping select {_x#0 isEqualTo _point#0 && {_x#1 isEqualTo _point#1}};
-        // systemChat str count _matching;
-        _overlapping = _overlapping - _matching;
-        private _matchingCount = count _matching;
-        if (_matchingCount > 1) then {
-            private _matchingZ = selectMin (_matching apply {_x#2});
-            _point set [2, _matchingZ];
-        };
-        _terrainPoints pushBack _point;
-    };
-    */
-
     if (count _connections > 1) then {
-        LINES1 append _polygonInner;
-        LINES2 append _polygonOuter;
-        private _polygonX = _polygonOuter apply {_x#0};
-        private _polygonY = _polygonOuter apply {_x#1};
+        // LINES1 append _polygonInner;
+        // LINES2 append _polygonOuter;
+        private _polygonX = _polygonInner apply {_x#0};
+        private _polygonY = _polygonInner apply {_x#1};
         private _polygonMinX = selectMin _polygonX;
         private _polygonMaxX = selectMax _polygonX;
         private _polygonMinY = selectMin _polygonY;
         private _polygonMaxY = selectMax _polygonY;
-
-        private _polygonMinZ = selectMin (_polygonOuter apply {_x#2});
-
         private _polygonRangeX = _polygonMaxX - _polygonMinX;
         private _polygonRangeY = _polygonMaxY - _polygonMinY;
         private _polygonCentre = [_polygonMinX + _polygonRangeX/2, _polygonMinY + _polygonRangeY/2, 0];
         private _polygonArea = [_polygonCentre, _polygonRangeX/2, _polygonRangeY/2, 0, true, -1];
         // systemChat str _polygonCentre;
-        private _polygonPoints = ([_polygonArea] call TerrainLib_fnc_getAreaTerrainGrid) select {_x inPolygon _polygonOuter};
+        private _polygonPoints = ([_polygonArea] call TerrainLib_fnc_getAreaTerrainGrid) select {_x inPolygon _polygonInner};
         _polygonPoints apply {
             private _point = _x;
-            if (_point inPolygon _polygonInner) then {
-                _x set [2, _polygonMinZ - _trueDepth];;
-            } else {
-                _x set [2, _polygonMinZ]
+            private _inInner = _point inPolygon _polygonInner;
+            private _sub = [0, _trueDepth] select _inInner;
+            // Use inverse distance weighting to calculate the height of the point
+            private _totalWeight = 0;
+            private _totalHeight = 0;
+            _polygonInner apply {
+                private _dist = _point distance2D _x;
+                private _weight = 1 / (_dist max 0.01);
+                _weight = _weight^3;
+                _totalWeight = _totalWeight + _weight;
+                _totalHeight = _totalHeight + _x#2 * _weight;
             };
+            private _height = _totalHeight / _totalWeight;
+            _point set [2, _height - _sub];
         };
         _terrainPoints append _polygonPoints;
         // _terrainPoints = _polygonPoints;
     };
 
-    _startNode setVariable [QGVAR(terrainPoints), _terrainPoints];
+    _node setVariable [QGVAR(terrainPoints), _terrainPoints];
 };

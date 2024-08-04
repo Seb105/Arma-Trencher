@@ -30,23 +30,8 @@ _nodes apply {
         private _dir = _nodePos getDir _connectionPos;
         private _halfWay = (_nodePos vectorAdd _connectionPos) vectorMultiply 0.5;
 
-        private _startEdgeR = [_nodePos, _dir + 90, _widthToEdge] call FUNC(offset);
-        private _startEdgeL = [_nodePos, _dir - 90, _widthToEdge] call FUNC(offset);
-        private _endEdgeR = [_connectionPos, _dir + 90, _widthToEdge] call FUNC(offset);
-        private _endEdgeL = [_connectionPos, _dir - 90, _widthToEdge] call FUNC(offset);
-        private _startZ = (getTerrainHeightASL _startEdgeR) min (getTerrainHeightASL _startEdgeL);
-        private _endZ = (getTerrainHeightASL _endEdgeR) min (getTerrainHeightASL _endEdgeL);
-
-        private _r1 = [_nodePos, _dir + 90, _trenchWidth/2] call FUNC(offset);
-        private _r2 = [_halfWay, _dir + 90, _trenchWidth/2] call FUNC(offset);
-        private _l1 = [_nodePos, _dir - 90, _trenchWidth/2] call FUNC(offset);
-        private _l2 = [_halfWay, _dir - 90, _trenchWidth/2] call FUNC(offset);
-
-        [_r1, _l1] apply {_x set [2, _startZ]};
-        [_r2, _l2] apply {_x set [2, _endZ]};
-
-        _lines pushBack [_r1, _r2];
-        _lines pushBack [_l2, _l1];
+        _lines pushBack [_nodePos, _halfWay, false];
+        _lines pushBack [_halfWay, _nodePos, true];
     } else {
         {
             private _nextNodeIndex = _forEachIndex + 1;
@@ -76,7 +61,7 @@ _nodes apply {
             private _tangent = tan (90 - _relAngle/2);
             private _sub = (_trenchWidth/2)  * _tangent;
             private _angleC = _relAngle;
-            private _lengthC = _objectsWidth;
+            private _lengthC = SEGMENT_LENGTH * _numHorizontal;
             private _angleA = (180 - _relAngle)/2;
             private _lengthA = ((_lengthC/sin _angleC) * sin _angleA) + 0.1;
             private _totalSub = _sub + _lengthA;
@@ -86,9 +71,10 @@ _nodes apply {
             _distances params ["_d1", "_d2"];
             // Intersection has overlapped
             if (_d1 min _d2 < 0) then {
-                ["Angle between trenches too small", 1, 5, true, 0.5] call BIS_fnc_3DENNotification;
+                ["Angle between trenches too small, or trench is too short", 1, 5, true, 0] call BIS_fnc_3DENNotification;
                 continue;
             };
+
 
             private _midStart = [_start, _a1, _d1] call FUNC(offset);
             private _midEnd = [_end, _a2+180, _d2] call FUNC(offset);
@@ -97,6 +83,7 @@ _nodes apply {
             private _o2 = [_midStart, _a1 + 90, _trenchWidth/2] call FUNC(offset);
             private _o3 = [_midEnd, _a2 + 90, _trenchWidth/2] call FUNC(offset);
             private _o4 = [_end, _a2 + 90, _trenchWidth/2] call FUNC(offset);
+            private _endDir = _o2 getDir _o3;
 
             private _o1r = [_start, _a1 + 90, _widthToEdge] call FUNC(offset);
             private _o1l = [_start, _a1 - 90, _widthToEdge] call FUNC(offset);
@@ -119,49 +106,50 @@ _nodes apply {
             _o3 set [2, _o3z];
             _o4 set [2, _o4z];
 
-            _lines pushBack [_o1, _o2];
+            _lines pushBack [_start, _midStart, false];
             _ends pushBack [_o2, _o3, _relAngle];
-            _lines pushBack [_o3, _o4];
+            _lines pushBack [_midEnd, _end, true];
 
-            private _endDir = _o2 getDir _o3;
-            private _offset = _cellSize * 1.42;
-            private _polygonOffset = (ceil (_widthToEdge - _totalSub)/_offset) * _offset;
+
+            private _offset1 = (1 + abs(sin(2*_a1)) * 0.42) * _cellSize;
+            private _lowerWidth1 = (ceil (_trenchWidth/_offset1) * _offset1 + _offset1 - _trenchWidth)/2;
+            private _offset2 = (1 + abs(sin(2*_a2)) * 0.42) * _cellSize;
+            private _lowerWidth2 = (ceil (_trenchWidth/_offset2) * _offset2 + _offset2 - _trenchWidth)/2;
+            private _polygonOffset = (_widthToEdge - _totalSub) max 0;
+            private _p1 = [_o2, _endDir+90, _lowerWidth1] call FUNC(offset);
+            private _p2 = [_o3, _endDir+90, _lowerWidth2] call FUNC(offset);
             private _inner = [
-                [_o2, _a1-180, _polygonOffset] call FUNC(offset),
-                _o2,
-                _o3,
-                [_o3, _a2, _polygonOffset] call FUNC(offset)
+                _p1,
+                _p2
             ];
             _polygonInner append _inner;
-            private _outer = [
-                [_inner#0, _a1+90, _objectsWidth] call FUNC(offset),
-                [_inner#1, _endDir+90, _objectsWidth] call FUNC(offset),
-                [_inner#2, _endDir+90, _objectsWidth] call FUNC(offset),
-                [_inner#3, _a2+90, _objectsWidth] call FUNC(offset)
-            ];
-            _polygonOuter append _outer;
-            // POLYGONS append [
-            //     [_o2, _endDir+90, _polygonOffset] call FUNC(offset), 
-            //     [_o3, _endDir+90, _polygonOffset] call FUNC(offset)
-            // ];
         } forEach _connections;
+        
+        private _polygonCount = count _polygonInner - 1;
+        for "_i" from 0 to _polygonCount step 2 do {
+            private _first = _polygonInner#_i;
+            private _second = _polygonInner#(_i+1);
+            private _incomingIndex = _i-1;
+            if (_incomingIndex < 0) then {
+                _incomingIndex = _polygonCount;
+            };
+            private _outgoingIndex = _i+2;
+            if (_outgoingIndex > _polygonCount) then {
+                _outgoingIndex = 0;
+            };
+            private _incoming = _polygonInner#_incomingIndex;
+            private _outgoing = _polygonInner#_outgoingIndex;
+
+            private _d1 = _incoming getDir _first;
+            private _d2 = _outgoing getDir _second;
+
+            private _p1 = [_first, _d1, _objectsWidth] call FUNC(offset);
+            private _p2 = [_second, _d2, _objectsWidth] call FUNC(offset);
+            _polygonOuter append [_p1, _p2];
+        };
+        // p1 = _polygonInner;
+        // p2 = _polygonOuter;
     };
-    // if (count _polygon > 0) then {
-    //     POLYGONS pushBack +_polygon;
-    // };
-    // Set all ends of this trench to the lowest Z of all ends
-    // private _lowestZ = selectMin (_ends apply {
-    //     _x params ["_p1", "_p2"];
-    //     private _pairZ = [_p1, _p2] apply {_x#2};
-    //     selectMin _pairZ
-    // });
-    // systemChat str _lowestZ;
-    // // This will apply to _lines too as they are references to the same array
-    // _ends apply {
-    //     _x params ["_p1", "_p2"];
-    //     _p1 set [2, _lowestZ];
-    //     _p2 set [2, _lowestZ];
-    // };
 
     _node setVariable [QGVAR(polygonInner), _polygonInner];
     _node setVariable [QGVAR(polygonOuter), _polygonOuter];
