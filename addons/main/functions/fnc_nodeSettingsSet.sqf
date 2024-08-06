@@ -6,7 +6,7 @@ private _names = [
     "TrenchDepth",
     "TrenchWidth",
     "BlendEnds",
-    "TrenchPitch",
+    // "TrenchPitch",
     "WallType",
     "DoSandbags",
     "DoBarbedWire",

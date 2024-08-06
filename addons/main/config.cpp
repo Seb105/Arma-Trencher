@@ -175,14 +175,14 @@ class CfgVehicles
                 typeName = "BOOL";
                 defaultValue = "true";
             };
-            class TrenchPitch: Edit
-            {
-                property = "TrenchPitch";
-                displayName = "Pitch";
-                tooltip = "Angle of trench wall";
-                typeName = "NUMBER";
-                defaultValue = "0";
-            };
+            // class TrenchPitch: Edit
+            // {
+            //     property = "TrenchPitch";
+            //     displayName = "Pitch";
+            //     tooltip = "Angle of trench wall";
+            //     typeName = "NUMBER";
+            //     defaultValue = "0";
+            // };
             class WallType: Combo
             {
                 property = "WallType";
@@ -342,7 +342,6 @@ class CfgVehicles
                 typeName = "BOOL";
                 defaultValue = "false";
             };
-                
             class SkipHidingObjects: Checkbox
             {
                 property = "SkipHidingObjects";

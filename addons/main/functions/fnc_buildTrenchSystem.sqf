@@ -53,7 +53,7 @@ _nodes apply {
 
 private _depth = _controller getVariable "TrenchDepth";
 private _trenchWidth = ((_controller getVariable "TrenchWidth") max 0) + 0.7;
-private _pitch = (_controller getVariable "TrenchPitch") - 3; // SLope of the trench walls
+private _pitch = -3; //(_controller getVariable "TrenchPitch") - 3; // SLope of the trench walls
 private _blendTrenchEnds = _controller getVariable "BlendEnds";
 private _skipTerrain = _controller getVariable "SkipTerrain";
 private _skipObjects = _controller getVariable "SkipObjects";
@@ -62,21 +62,22 @@ private _transitionLength = _controller getVariable "TransitionLength";
 
 private _numHorizontal = 1 + (_controller getVariable "AdditionalHorizSegments");
 private _objectsWidth = SEGMENT_WIDTH * _numHorizontal;
-// private _minObjectsWidth = 1 * _cellSize * (sqrt 2);
-// if (_objectsWidth < _minObjectsWidth) then {
-//     private _recommendedExtraObjects = ceil (_minObjectsWidth / SEGMENT_WIDTH) - 1;
-//     private _msg = format ["Terrain has cell size of %1. Recommend setting 'Extra Horizontal Segments' to %2 or more to avoid gaps at edge of trench", _cellSize, _recommendedExtraObjects];
-//     // [_msg, 1, 5, true, 0] call BIS_fnc_3DENNotification;
-//     systemChat _msg;
-// };
-
-
-// Get new objs to place
-// private _widthToObj = (SEGMENT_WIDTH + _trenchWidth)/2;
-private _widthToEdge = _trenchWidth/2 + _objectsWidth;
+private _widthToObj = _trenchWidth/2;
+private _widthToEdge = _widthToObj + _objectsWidth;
+private _widthToTransition = _widthToEdge + _transitionLength;
+private _trenchProperties = [
+    _widthToObj,
+    _widthToEdge,
+    _widthToTransition,
+    _trenchWidth,
+    _objectsWidth,
+    _transitionLength,
+    _numHorizontal,
+    _cellSize
+];
 private _trueDepth = 0 max (_depth - SEGMENT_FALL * _numHorizontal);
 if !(_skipObjects) then {
-    [_nodes, _trenchWidth, _widthToEdge, _numHorizontal, _cellSize, _transitionLength] call FUNC(getTrenchLines);
+    [_nodes, _trenchProperties] call FUNC(getTrenchLines);
     // [_nodes, _pitch, _trenchWidth, _widthToEdge, _numHorizontal] call FUNC(getTrenchObjects);
 };
 if (true) exitWith {};
