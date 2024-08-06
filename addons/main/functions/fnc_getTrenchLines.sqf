@@ -8,7 +8,9 @@ _trenchProperties params [
     "_trenchWidth",
     "_objectsWidth",
     "_transitionLength",
-    "_numHorizontal"
+    "_numHorizontal",
+    "_cellSize",
+    "_trueDepth"
 ];
 private _cornerLength = (SEGMENT_LENGTH * _numHorizontal);
 _nodes apply {
@@ -153,9 +155,9 @@ _nodes apply {
                 [_b3, _b4]
             ];
 
-            _polygonInner append [_midStart, _i2, _i3, _midEnd];
-            _polygonOuter append [_midStart, _i2, _o2, _o3, _i3, _midEnd];
-            _polygonTransition append [_midStart, _i2, _o2, _b2, _b3, _o3, _i3, _midEnd];
+            _polygonInner append [_i2, _i3];
+            _polygonOuter append [_i2, _o2, _o3, _i3];
+            _polygonTransition append [_i2, _o2, _b2, _b3, _o3, _i3];
         } forEach _connections;
     } else {
         private _nextNode = _connections#0;

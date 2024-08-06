@@ -65,6 +65,7 @@ private _objectsWidth = SEGMENT_WIDTH * _numHorizontal;
 private _widthToObj = _trenchWidth/2;
 private _widthToEdge = _widthToObj + _objectsWidth;
 private _widthToTransition = _widthToEdge + _transitionLength;
+private _trueDepth = 0 max (_depth - SEGMENT_FALL * _numHorizontal);
 private _trenchProperties = [
     _widthToObj,
     _widthToEdge,
@@ -73,28 +74,27 @@ private _trenchProperties = [
     _objectsWidth,
     _transitionLength,
     _numHorizontal,
-    _cellSize
+    _cellSize,
+    _trueDepth
 ];
-private _trueDepth = 0 max (_depth - SEGMENT_FALL * _numHorizontal);
 if !(_skipObjects) then {
     [_nodes, _trenchProperties] call FUNC(getTrenchLines);
     // [_nodes, _pitch, _trenchWidth, _widthToEdge, _numHorizontal] call FUNC(getTrenchObjects);
 };
-if (true) exitWith {};
-// Get objs to hide
-if !(_skipHidingObjects) then {
-    [_nodes, _trenchWidth/2 + SEGMENT_WIDTH] call FUNC(getObjsToHide)
-};
+// // Get objs to hide
+// if !(_skipHidingObjects) then {
+//     [_nodes, _trenchWidth/2 + SEGMENT_WIDTH] call FUNC(getObjsToHide)
+// };
 
 // Handle terrain
 if !(_skipTerrain) then {
-    [_nodes, _trenchWidth, _widthToEdge, _transitionLength, _cellSize, _trueDepth, _blendTrenchEnds] call FUNC(getTerrainPoints);
+    [_nodes, _trenchProperties, _blendTrenchEnds] call FUNC(getTerrainPoints);
     [_nodes, _widthToEdge, _blendTrenchEnds, _trueDepth, _cellSize] call FUNC(handleTerrain);
 };
 
 // Create new objs
-[_nodes] call trencher_main_fnc_handleObjects;
-[_nodes, _controller, _pitch] call trencher_main_fnc_handleObjectAdditions;
+// [_nodes] call trencher_main_fnc_handleObjects;
+// [_nodes, _controller, _pitch] call trencher_main_fnc_handleObjectAdditions;
 
-// Write to SQM
-call FUNC(writeToSQM);
+// // Write to SQM
+// call FUNC(writeToSQM);
