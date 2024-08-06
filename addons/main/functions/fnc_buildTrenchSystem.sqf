@@ -76,9 +76,10 @@ private _objectsWidth = SEGMENT_WIDTH * _numHorizontal;
 private _widthToEdge = _trenchWidth/2 + _objectsWidth;
 private _trueDepth = 0 max (_depth - SEGMENT_FALL * _numHorizontal);
 if !(_skipObjects) then {
-    [_nodes, _trenchWidth, _widthToEdge, _numHorizontal, _cellSize] call FUNC(getTrenchLines);
-    [_nodes, _pitch, _trenchWidth, _widthToEdge, _numHorizontal] call FUNC(getTrenchObjects);
+    [_nodes, _trenchWidth, _widthToEdge, _numHorizontal, _cellSize, _transitionLength] call FUNC(getTrenchLines);
+    // [_nodes, _pitch, _trenchWidth, _widthToEdge, _numHorizontal] call FUNC(getTrenchObjects);
 };
+if (true) exitWith {};
 // Get objs to hide
 if !(_skipHidingObjects) then {
     [_nodes, _trenchWidth/2 + SEGMENT_WIDTH] call FUNC(getObjsToHide)
@@ -96,5 +97,3 @@ if !(_skipTerrain) then {
 
 // Write to SQM
 call FUNC(writeToSQM);
-// systemChat str ["Trench system updated", _origin];
-// _controller setVariable [QGVAR(locked), false];

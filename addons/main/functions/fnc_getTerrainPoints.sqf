@@ -15,7 +15,8 @@ _nodes apply {
     private _polygonOuter = _node getVariable QGVAR(polygonOuter);
     private _singleConnection = count _connections == 1;
     private _blendEnds = _singleConnection && _blendTrenchEnds;
-    private _lines = _node getVariable QGVAR(lines);
+    private _lines = _node getVariable QGVAR(terrainLines);
+    lines = _lines;
     _lines apply {
         _x params ["_startPos", "_endPos", "_reversed"];
         private _dir = _startPos getDir _endPos;
@@ -54,9 +55,9 @@ _nodes apply {
 
         _newPoints apply {
             private _point = _x; 
-            if (_point inPolygon _polygonOuter) then {
-                continue;
-            };
+            // if (_point inPolygon _polygonOuter) then {
+            //     continue;
+            // };
             if (_skippers findIf {_point inArea _x} isNotEqualTo -1) then {continue};
             // This extracts the width along the trench of the point, ignoring the length component
             private _dirToStart = (_startPos getDir _point) - _dir;
@@ -112,41 +113,41 @@ _nodes apply {
         _terrainPoints append _selectedPoints;
     };
 
-    if (count _connections > 1) then {
-        // LINES1 append _polygonInner;
-        // LINES2 append _polygonOuter;
-        private _polygonX = _polygonInner apply {_x#0};
-        private _polygonY = _polygonInner apply {_x#1};
-        private _polygonMinX = selectMin _polygonX;
-        private _polygonMaxX = selectMax _polygonX;
-        private _polygonMinY = selectMin _polygonY;
-        private _polygonMaxY = selectMax _polygonY;
-        private _polygonRangeX = _polygonMaxX - _polygonMinX;
-        private _polygonRangeY = _polygonMaxY - _polygonMinY;
-        private _polygonCentre = [_polygonMinX + _polygonRangeX/2, _polygonMinY + _polygonRangeY/2, 0];
-        private _polygonArea = [_polygonCentre, _polygonRangeX/2, _polygonRangeY/2, 0, true, -1];
-        // systemChat str _polygonCentre;
-        private _polygonPoints = ([_polygonArea] call TerrainLib_fnc_getAreaTerrainGrid) select {_x inPolygon _polygonInner};
-        _polygonPoints apply {
-            private _point = _x;
-            private _inInner = _point inPolygon _polygonInner;
-            private _sub = [0, _trueDepth] select _inInner;
-            // Use inverse distance weighting to calculate the height of the point
-            private _totalWeight = 0;
-            private _totalHeight = 0;
-            _polygonInner apply {
-                private _dist = _point distance2D _x;
-                private _weight = 1 / (_dist max 0.01);
-                _weight = _weight^3;
-                _totalWeight = _totalWeight + _weight;
-                _totalHeight = _totalHeight + _x#2 * _weight;
-            };
-            private _height = _totalHeight / _totalWeight;
-            _point set [2, _height - _sub];
-        };
-        _terrainPoints append _polygonPoints;
-        // _terrainPoints = _polygonPoints;
-    };
+    // if (count _connections > 1) then {
+    //     // LINES1 append _polygonInner;
+    //     // LINES2 append _polygonOuter;
+    //     private _polygonX = _polygonInner apply {_x#0};
+    //     private _polygonY = _polygonInner apply {_x#1};
+    //     private _polygonMinX = selectMin _polygonX;
+    //     private _polygonMaxX = selectMax _polygonX;
+    //     private _polygonMinY = selectMin _polygonY;
+    //     private _polygonMaxY = selectMax _polygonY;
+    //     private _polygonRangeX = _polygonMaxX - _polygonMinX;
+    //     private _polygonRangeY = _polygonMaxY - _polygonMinY;
+    //     private _polygonCentre = [_polygonMinX + _polygonRangeX/2, _polygonMinY + _polygonRangeY/2, 0];
+    //     private _polygonArea = [_polygonCentre, _polygonRangeX/2, _polygonRangeY/2, 0, true, -1];
+    //     // systemChat str _polygonCentre;
+    //     private _polygonPoints = ([_polygonArea] call TerrainLib_fnc_getAreaTerrainGrid) select {_x inPolygon _polygonInner};
+    //     _polygonPoints apply {
+    //         private _point = _x;
+    //         private _inInner = _point inPolygon _polygonInner;
+    //         private _sub = [0, _trueDepth] select _inInner;
+    //         // Use inverse distance weighting to calculate the height of the point
+    //         private _totalWeight = 0;
+    //         private _totalHeight = 0;
+    //         _polygonInner apply {
+    //             private _dist = _point distance2D _x;
+    //             private _weight = 1 / (_dist max 0.01);
+    //             _weight = _weight^3;
+    //             _totalWeight = _totalWeight + _weight;
+    //             _totalHeight = _totalHeight + _x#2 * _weight;
+    //         };
+    //         private _height = _totalHeight / _totalWeight;
+    //         _point set [2, _height - _sub];
+    //     };
+    //     _terrainPoints append _polygonPoints;
+    //     // _terrainPoints = _polygonPoints;
+    // };
 
     _node setVariable [QGVAR(terrainPoints), _terrainPoints];
 };
