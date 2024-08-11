@@ -189,7 +189,7 @@ _nodes apply {
             _innerPoints apply {
                 private _dist = _point distance2D _x;
                 private _weight = 1 / (_dist max 0.0001);
-                _weight = _weight^3;
+                _weight = _weight^2;
                 _totalWeight = _totalWeight + _weight;
                 _totalHeight = _totalHeight + _x#2 * _weight;
             };

@@ -250,7 +250,7 @@ _nodes apply {
         _x pushBack (_x#0);
     } forEach [_polygonOuter, _polygonInner, _polygonTransition];
 
-    // p1 = _polygonInner;
+    p1 = _polygonInner;
     // p2 = _polygonOuter;
     // p3 = _polygonTransition;
 

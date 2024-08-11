@@ -77,9 +77,9 @@ private _trenchProperties = [
     _cellSize,
     _trueDepth
 ];
+[_nodes, _trenchProperties] call FUNC(getTrenchLines);
 if !(_skipObjects) then {
-    [_nodes, _trenchProperties] call FUNC(getTrenchLines);
-    // [_nodes, _pitch, _trenchWidth, _widthToEdge, _numHorizontal] call FUNC(getTrenchObjects);
+    [_nodes, _pitch, _trenchWidth, _widthToEdge, _numHorizontal] call FUNC(getTrenchObjects);
 };
 // // Get objs to hide
 // if !(_skipHidingObjects) then {
@@ -93,7 +93,7 @@ if !(_skipTerrain) then {
 };
 
 // Create new objs
-// [_nodes] call trencher_main_fnc_handleObjects;
+[_nodes] call trencher_main_fnc_handleObjects;
 // [_nodes, _controller, _pitch] call trencher_main_fnc_handleObjectAdditions;
 
 // // Write to SQM

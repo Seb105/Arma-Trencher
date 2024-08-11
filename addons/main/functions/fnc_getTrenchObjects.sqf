@@ -1,7 +1,7 @@
 #include "script_component.hpp"
 params ["_nodes", "_pitch", "_trenchWidth", "_widthToEdge", "_numHorizontal"];
-private _distToOtherEdge = _widthToEdge + SEGMENT_WIDTH_HALF + _trenchWidth/2;
-private _distToFront = _widthToEdge - SEGMENT_WIDTH_HALF - _trenchWidth/2;
+private _distToOtherEdge = _widthToEdge + _trenchWidth/2;
+private _distToFront = SEGMENT_WIDTH;
 _nodes apply {
     private _toPlace = [];
     private _node = _x;
@@ -12,22 +12,20 @@ _nodes apply {
         _x getVariable QGVAR(area)
     };
     
-    private _lines = _node getVariable QGVAR(lines);
-    private _ends = _node getVariable QGVAR(ends);
+    private _lines = _node getVariable QGVAR(mainLines);
+    private _ends = _node getVariable QGVAR(cornerLines);
     _lines apply {
-        _x params ["_start", "_end"];
+        _x params ["_", "_innerLine", "_", "_", "_", "_"];
+        _innerLine params ["_start", "_end"];
         // if (_isSinglePoint) then {continue};
         private _dir = _start getDir _end;
         private _pieceDir = _dir - 90;
         private _trueStart = [_start, _dir, SEGMENT_LENGTH_HALF] call FUNC(offset);
         private _trueEnd = [_end, _dir+180, SEGMENT_LENGTH_HALF] call FUNC(offset);
-        private _objCentreStart = [_trueStart, _dir+90, SEGMENT_WIDTH_HALF + _trenchWidth/2] call FUNC(offset);
-        private _objCentreEnd = [_trueEnd, _dir+90, SEGMENT_WIDTH_HALF + _trenchWidth/2] call FUNC(offset);
-        // SWEEPS pushBack [_start, _end];
-        // Get 3d distance so we can get extra objects on steeps slopes.
-        // private _start3D = _start vectorAdd [0,0,getTerrainHeightASL _start];
-        // private _end3D = _end vectorAdd [0,0,getTerrainHeightASL _end];
-        private _distance = _start vectorDistance _end;
+        private _objCentreStart = [_trueStart, _dir+90, SEGMENT_WIDTH_HALF] call FUNC(offset);
+        private _objCentreEnd = [_trueEnd, _dir+90, SEGMENT_WIDTH_HALF] call FUNC(offset);
+
+        private _distance = _start distance2D _end;
         private _isSinglePoint = _distance < SEGMENT_LENGTH;
         private _numSegments = (floor (_distance/SEGMENT_LENGTH)) max 1;
         private _segmentOffset = (_objCentreEnd vectorDiff _objCentreStart) vectorMultiply (1/_numSegments);
@@ -38,8 +36,8 @@ _nodes apply {
         // of the trench are considered when calculating the height of the trench, and
         // that both sides are the same height.
         // private _offsetToBack = [[0,0,0], _dir-90, SEGMENT_WIDTH_HALF] call FUNC(offset);
-        private _offsetToOtherSide = [[0,0,0], _dir-90, _distToOtherEdge] call FUNC(offset);
-        private _offsetToFront = [[0,0,0], _dir+90, _distToFront] call FUNC(offset);
+        private _offsetToOtherSide = [[0,0,0], _dir-90, _distToFront] call FUNC(offset);
+        private _offsetToFront = [[0,0,0], _dir-90, _distToFront] call FUNC(offset);
         if (_isSinglePoint) then {
             _numSegments = 0;
             _objCentreStart = (_objCentreStart vectorAdd _objCentreEnd) vectorMultiply 0.5;
@@ -74,7 +72,8 @@ _nodes apply {
     };
 
     _ends apply {
-        _x params ["_start", "_end", "_relAngle"];
+        _x params ["_centreLine", "_innerLine", "_edgeLine", "_transitionLine", "_a1", "_a2", "_relAngle"];
+        _innerLine params ["_start", "_end"];
         private _dir = _start getDir _end;
         private _long = _relAngle > 190;
     
