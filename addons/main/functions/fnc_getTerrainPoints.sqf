@@ -11,6 +11,7 @@ _trenchProperties params [
     "_cellSize",
     "_trueDepth"
 ];
+private _widthToOtherEdge = _widthToEdge + _trenchWidth/2 + SEGMENT_WIDTH/2;
 private _doTransition = _transitionLength > 0;
 _nodes apply {
     private _node = _x;    
@@ -57,10 +58,23 @@ _nodes apply {
         private _offsetLeft = [[0,0], _dir - 90, _widthToEdge] call FUNC(offset);
         private _offsetRight = [[0,0], _dir + 90, _widthToEdge] call FUNC(offset);
         private _newPoints = ([_area] call TerrainLib_fnc_getAreaTerrainGrid) select {(_x inPolygon _ownPolygon)};
+
+        // private _dirToInnerStart = (_startPos getDir _innerLine#0) - _dir;
+        // private _distToInnerStart = _startPos distance2D _innerLine#0;
+        // private _innerXStart = _distToInnerStart * cos _dirToInnerStart;
+
+        // private _dirToInnerEnd = (_startPos getDir _innerLine#1) - _dir;
+        // private _distToInnerEnd = _startPos distance2D _innerLine#1;
+        // private _innerXEnd = _distToInnerEnd * cos _dirToInnerEnd;
+
+        // private _minX = _innerXStart min _innerXEnd;
+        // private _maxX = _innerXStart max _innerXEnd;
+
         _newPoints apply {
             private _point = _x;
             private _dirToStart = (_startPos getDir _point) - _dir;
             private _distToCenter  = _point distance2D _startPos;
+            // private _xComponent = ((_distToCenter * cos _dirToStart) max _minX) min _maxX;]
             private _xComponent = _distToCenter * cos _dirToStart;
             private _yComponent =  _distToCenter * sin _dirToStart;
             // if !(_point inPolygon _ownPolygon) then {
@@ -72,9 +86,11 @@ _nodes apply {
                 getTerrainHeightASL (_linePos vectorAdd _offsetRight)
             ];
             private _height = _lowestEdge;
+            // Within trench
             if (_yComponent < _lowerWidth) then {
                 _height = _height - _trueDepth;
             };
+            // 
             if (_yComponent > _widthToEdge && _doTransition) then {
                 private _transitionEdge = getTerrainHeightASL ([_linePos, _dir+90, _widthToTransition] call FUNC(offset));
                 private _transitionAmount  = (_yComponent - _widthToEdge) / _transitionLength;
@@ -91,9 +107,9 @@ _nodes apply {
         if (_relAngle < 180) then {
             continue;
         };
-        _centreline params ["_startPos", "_endPos"];
-        _innerline params ["_inner1", "_inner2"];
-        _edgeline params ["_edge1", "_edge2"];
+        _centreLine params ["_startPos", "_endPos"];
+        _innerLine params ["_inner1", "_inner2"];
+        _edgeLine params ["_edge1", "_edge2"];
         _transitionLine params ["_trans1", "_trans2"];
         private _ownPolygon = [
             _inner1,
@@ -107,15 +123,15 @@ _nodes apply {
         private _dir = _inner1 getDir _inner2;
         private _fromTo = _edge1 vectorFromTo _edge2;
 
-        private _zNear1 = getTerrainHeightASL _edge1;
-        private _far1 =  [_edge1, _a1-90, _widthToEdge*2] call FUNC(offset);
-        private _zFar1 = getTerrainHeightASL _far1;
-        private _z1 = _zNear1 min _zFar1;
+        private _z1 = selectMin [
+            getTerrainHeightASL ([_inner1, _a1+90, _objectsWidth] call FUNC(offset)),
+            getTerrainHeightASL ([_inner1, _a1-90, _widthToOtherEdge] call FUNC(offset))
+        ];
 
-        private _zNear2 = getTerrainHeightASL _edge2;
-        private _far2 =  [_edge2, _a2-90, _widthToEdge*2] call FUNC(offset);
-        private _zFar2 = getTerrainHeightASL _far2;
-        private _z2 = _zNear2 min _zFar2;
+        private _z2 = selectMin [
+            getTerrainHeightASL ([_inner2, _a2+90, _objectsWidth] call FUNC(offset)),
+            getTerrainHeightASL ([_inner2, _a2-90, _widthToOtherEdge] call FUNC(offset))
+        ];
 
         private _centreStart = [_trans1, _dir-90, _widthToTransition/2] call FUNC(offset);
         private _areaCentre = [_centreStart, _dir, _length/2] call FUNC(offset);
@@ -124,19 +140,19 @@ _nodes apply {
         private _newPointsFiltered = [];
         {
             private _point = _x;
-            private _dirToStart = (_startPos getDir _point) - _dir;
-            private _distToCenter  = _point distance2D _startPos;
+            private _dirToStart = (_inner1 getDir _point) - _dir;
+            private _distToCenter  = _point distance2D _inner1;
             private _xComponent = _distToCenter * cos _dirToStart;
             private _yComponent =  _distToCenter * sin _dirToStart;
-            if (_yComponent < _widthToObj) then {
+            if (_yComponent < 0) then {
                 continue; // Handled in inner polygon
             };
-            private _xWeight = _xComponent / _length;
+            private _xWeight = _xComponent / _length min 1 max 0;
             private _height = _z1 * (1 - _xWeight) + _z2 * _xWeight;
-            if (_yComponent > _widthToEdge && _doTransition) then {
-                private _linePos = _startPos vectorAdd (_fromTo vectorMultiply _xComponent);
+            if (_yComponent > _objectsWidth && _doTransition) then {
+                private _linePos = _inner1 vectorAdd (_fromTo vectorMultiply _xComponent);
                 private _transitionEdge = getTerrainHeightASL ([_linePos, _dir+90, _widthToTransition] call FUNC(offset));
-                private _transitionAmount  = (_yComponent - _widthToEdge) / _transitionLength;
+                private _transitionAmount  = (_yComponent - _objectsWidth) / _transitionLength;
                 _height = _height * (1 - _transitionAmount) + _transitionEdge * _transitionAmount;
             };
             _point set [2, _height];

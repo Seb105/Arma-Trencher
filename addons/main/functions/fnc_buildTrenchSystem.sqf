@@ -75,11 +75,12 @@ private _trenchProperties = [
     _transitionLength,
     _numHorizontal,
     _cellSize,
-    _trueDepth
+    _trueDepth,
+    _pitch
 ];
 [_nodes, _trenchProperties] call FUNC(getTrenchLines);
 if !(_skipObjects) then {
-    [_nodes, _pitch, _trenchWidth, _widthToEdge, _numHorizontal] call FUNC(getTrenchObjects);
+    [_nodes, _trenchProperties] call FUNC(getTrenchObjects);
 };
 // // Get objs to hide
 // if !(_skipHidingObjects) then {
