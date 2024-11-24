@@ -100,7 +100,7 @@ _nodes apply {
         _x params ["_centreLine", "_innerLine", "_edgeLine", "_transitionLine", "_a1", "_a2", "_relAngle"];
         _innerLine params ["_start", "_end"];
         private _dir = _start getDir _end;
-        private _long = _relAngle > 190;
+        private _long = _relAngle > 200;
         private _pieceDir = _dir - 90;
         private _startHeight = selectMin [
             getTerrainHeightASL ([_start, _a1+90, _objectsWidth] call FUNC(offset)),
@@ -111,7 +111,7 @@ _nodes apply {
             getTerrainHeightASL ([_end, _a2-90, _widthToEdge + _trenchWidth/2] call FUNC(offset))
         ];
 
-        private _fall = _endHeight - _startHeight;
+        private _fall = _startHeight - _endHeight;
         private _distanced2d = _start distance2D _end;
         // private _numHorizontal = 1;
         private _pieceRoll = atan (_fall / _distanced2d);
@@ -123,7 +123,7 @@ _nodes apply {
             [[sin _pieceRoll, -sin _pitch, cos _pieceRoll * cos _pitch], -_pieceDir] call BIS_fnc_rotateVector2D
         ];
         for "_i" from 1 to _numHorizontal do {
-            private _isEnd = (_i == _numHorizontal || _i == 1) && _long;
+            private _isEnd = false;//(_i == _numHorizontal || _i == 1) && _long;
             private _proportion = (_i-0.5) / _numHorizontal;
             private _height = _startHeight - _fall*_proportion;
             private _edgeCentre = [_start, _dir, _proportion * _distanced2d] call FUNC(offset);

@@ -6,7 +6,6 @@ private _controllers = _allNodes select {
 };
 
 
-
 if (count _controllers > 1) exitWith {
     ["A trench can only have 1 controller module synced", 1, 5, true, 0.5] call BIS_fnc_3DENNotification;
     [_allNodes] call trencher_main_fnc_cleanUpNodes;
@@ -14,6 +13,8 @@ if (count _controllers > 1) exitWith {
 if (count _allNodes < 2) exitWith {
     [_allNodes] call trencher_main_fnc_cleanUpNodes;
 };
+systemChat "test";
+
 private _cellSize = (getTerrainInfo)#2;
 private _controller = _controllers#0;
 
