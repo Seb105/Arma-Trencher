@@ -48,12 +48,16 @@ private _hescos = [hesco_1, hesco_2];
 private _hesco_ramp = [hesco_ramp];
 private _dragonsTeeth = [dragonsteeth_1, dragonsteeth_2, dragonsteeth_3, dragonsteeth_4, dragonsteeth_5, dragonsteeth_6];
 private _hedgeHogs = [hedgehog_1, hedgehog_2, hedgehog_3, hedgehog_4];
+private _alltimbers = [timber_1, timber_2, timber_3];
+private _allsandbagwalls = [sandbagwall_1, sandbagwall_2, sandbagwall_3, sandbagwall_4, sandbagwall_5, sandbagwall_6, sandbagwall_7, sandbagwall_8];
 private _allOffsets = [
     ["WALLS: CONC", _concrete],
     ["WALLS: FRAME", _frame],
     ["WALLS: METAL", _sheets],
     ["WALLS: HESCOS", _hescos],
     ["WALLS: HESCOS RAMP", _hesco_ramp],
+    ["WALLS: TIMBER", _alltimbers],
+    ["WALLS: SANDBAGWALLL", _allsandbagwalls],
     ["BARBED WIRE", _barbedWire],
     ["SANDBAGS", _sandbags],
     ["LOWER SEGMENT", _lower],

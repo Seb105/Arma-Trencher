@@ -217,11 +217,34 @@ class CfgVehicles
                         name = "Hesco";
                         value = "3";
                     };
+                    class HescoGreen {
+                        default = 0;
+                        name = "Hesco (green)";
+                        value = "4";
+                    };
                     class HescoRamp
                     {
                         default = 0;
                         name = "Hesco (Ramp)";
-                        value = "4";
+                        value = "5";
+                    };
+                    class HescoRampGreen 
+                    {
+                        default = 0;
+                        name = "Hesco (Ramp, green)";
+                        value = "6";
+                    };
+                    class Timbers
+                    {
+                        default = 0;
+                        name = "Timbers";
+                        value = "7";
+                    };
+                    class SandbagsWall
+                    {
+                        default = 0;
+                        name = "Sandbags";
+                        value = "8";
                     };
                 };
             };

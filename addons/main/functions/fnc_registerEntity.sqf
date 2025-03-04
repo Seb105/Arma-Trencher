@@ -1,5 +1,6 @@
 #include "script_component.hpp"
 params ["_module"];
+
 if (_module isKindOf QGVAR(Module_TrenchSkipper)) then {
     private _skipper = _module;
     private _size = (_skipper get3DENAttribute "Size3")#0;
@@ -74,7 +75,7 @@ if (_module isKindOf QGVAR(Module_TrenchSkipper)) then {
             };
         }];
     } forEach _ehs;
-}
+};
 
 if (_module isKindOf QGVAR(Module_TrenchPiece)) then {
     private _ehs = [
