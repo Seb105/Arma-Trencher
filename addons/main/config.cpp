@@ -224,7 +224,7 @@ class CfgVehicles
                         value = "4";
                     };
                 };
-            };
+            };asdasdasdasds
             class DoSandbags: Combo
             {
                 property = "DoSandbags";
